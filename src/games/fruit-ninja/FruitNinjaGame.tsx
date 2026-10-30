@@ -7,7 +7,7 @@ import { playSound } from "@/components/AudioEffects";
 const CANVAS_W = 256;
 const CANVAS_H = 224;
 const GRAVITY = 0.115;
-const MAX_MISSED = 3;
+const MAX_MISSED = 5;
 
 interface FruitType {
   name: string;
@@ -142,6 +142,7 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
   const [gamePhase, setGamePhase] = useState<"title" | "playing" | "gameover">(
     "title"
   );
+  const [heartsLeft, setHeartsLeft] = useState<number>(MAX_MISSED);
   const [finalStats, setFinalStats] = useState({
     score: 0,
     highScore: 0,
@@ -172,7 +173,7 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
     screenFlash: 0,
     shakeTimer: 0,
     hudFlashTimer: 0,
-    gameOverReason: "" as "BOMB EXPLODED!" | "3 FRUITS MISSED!" | "",
+    gameOverReason: "" as "BOMB EXPLODED!" | "ALL 5 HEARTS LOST!" | "",
   });
 
   const startGame = useCallback(() => {
@@ -196,12 +197,13 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
     s.shakeTimer = 0;
     s.hudFlashTimer = 0;
     s.gameOverReason = "";
+    setHeartsLeft(MAX_MISSED);
     setGamePhase("playing");
     playSound("coin");
   }, []);
 
   const triggerGameOver = useCallback(
-    (reason: "BOMB EXPLODED!" | "3 FRUITS MISSED!") => {
+    (reason: "BOMB EXPLODED!" | "ALL 5 HEARTS LOST!") => {
       const s = stateRef.current;
       if (s.phase !== "playing") return;
       s.phase = "gameover";
@@ -494,38 +496,14 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const s = stateRef.current;
       if (e.key === "r" || e.key === "R") {
         e.preventDefault();
         startGame();
-        return;
-      }
-      if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        if (s.phase !== "playing") {
-          startGame();
-          return;
-        }
-        // Keyboard Katana Whirlwind Slash across the screen (avoids bombs!)
-        playSound("blip");
-        const yMid = CANVAS_H * 0.42;
-        for (let x = 20; x <= CANVAS_W - 20; x += 14) {
-          s.blade.push({
-            x,
-            y: yMid + Math.sin(x * 0.04) * 28,
-            life: 10,
-          });
-        }
-        for (const f of s.fruits) {
-          if (!f.sliced && !f.type.isBomb && f.y < CANVAS_H - 12) {
-            sliceFruit(f);
-          }
-        }
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [sliceFruit, startGame]);
+  }, [startGame]);
 
   useEffect(() => {
     let animId: number;
@@ -627,25 +605,44 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
         ctx.fillRect(x, 24, 2, CANVAS_H - 24);
       }
 
-      // 2. Top Arcade HUD Bar with Flash Feedback
+      // 2. Top Arcade HUD Bar with 5 Hearts in Top-Left & Score in Top-Right
       ctx.fillStyle = s.hudFlashTimer > 0 ? "#064e3b" : "#090d16";
       ctx.fillRect(0, 0, CANVAS_W, 22);
       ctx.fillStyle = s.hudFlashTimer > 0 ? "#34d399" : "#eab308";
       ctx.fillRect(0, 21, CANVAS_W, 2);
       if (s.hudFlashTimer > 0) s.hudFlashTimer--;
 
-      ctx.font = "7px 'Press Start 2P', monospace";
-      ctx.fillStyle = "#facc15";
-      ctx.fillText(`SCORE:${s.score}`, 6, 14);
-
-      ctx.fillStyle = s.hudFlashTimer > 0 ? "#ffffff" : "#4ade80";
-      ctx.fillText(`+${s.earnedPts}PTS`, 104, 14);
-
-      // Missed Fruits X X X indicator
+      // 5 Pixel Hearts in Top-Left Corner (lose 1 heart per missed fruit)
+      const heartsRemaining = Math.max(0, MAX_MISSED - s.missed);
       for (let i = 0; i < MAX_MISSED; i++) {
-        ctx.fillStyle = i < s.missed ? "#ef4444" : "#374151";
-        ctx.fillText("X", CANVAS_W - 40 + i * 13, 14);
+        const hx = 14 + i * 14;
+        const hy = 6;
+        const alive = i < heartsRemaining;
+        // White outline so hearts pop against dark background
+        ctx.fillStyle = alive ? "#ffffff" : "#1f2937";
+        ctx.fillRect(hx - 1, hy - 1, 12, 11);
+        ctx.fillStyle = alive ? "#ef4444" : "#374151";
+        // Top lobes of pixel heart
+        ctx.fillRect(hx + 1, hy, 3, 2);
+        ctx.fillRect(hx + 6, hy, 3, 2);
+        // Middle body
+        ctx.fillRect(hx, hy + 2, 10, 3);
+        // Lower taper
+        ctx.fillRect(hx + 1, hy + 5, 8, 2);
+        ctx.fillRect(hx + 2, hy + 7, 6, 1);
+        ctx.fillRect(hx + 4, hy + 8, 2, 1);
+        if (alive) {
+          ctx.fillStyle = "#fecaca";
+          ctx.fillRect(hx + 1, hy + 1, 2, 2);
+        }
       }
+
+      ctx.font = "7px 'Press Start 2P', monospace";
+      ctx.fillStyle = s.hudFlashTimer > 0 ? "#ffffff" : "#4ade80";
+      ctx.fillText(`+${s.earnedPts}PTS`, 92, 14);
+
+      ctx.fillStyle = "#facc15";
+      ctx.fillText(`SCORE:${s.score}`, 168, 14);
 
       // 3. Game State Logic
       if (s.phase === "title") {
@@ -670,12 +667,12 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
         ctx.fillStyle = "#e5e7eb";
         ctx.font = "6px 'Press Start 2P', monospace";
         ctx.fillText("SWIPE MOUSE TO SLICE!", 64, 138);
-        ctx.fillText("AVOID BOMBS! MAX 3 MISS", 58, 152);
+        ctx.fillText("AVOID BOMBS! 5 HEARTS", 62, 152);
 
         if (Math.floor(Date.now() / 400) % 2 === 0) {
           ctx.fillStyle = "#facc15";
           ctx.font = "7px 'Press Start 2P', monospace";
-          ctx.fillText("CLICK OR SPACE TO START", 46, 176);
+          ctx.fillText("CLICK SCREEN TO START", 52, 176);
         }
       } else if (s.phase === "playing") {
         s.elapsedFrames++;
@@ -731,16 +728,17 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
           if (f.y > CANVAS_H + 24 && f.peaked) {
             if (!f.sliced && !f.type.isBomb) {
               s.missed += 1;
+              setHeartsLeft(Math.max(0, MAX_MISSED - s.missed));
               playSound("blockHit");
               s.texts.push({
                 x: Math.max(16, Math.min(CANVAS_W - 48, f.x - 12)),
                 y: CANVAS_H - 14,
-                text: "MISS!",
+                text: "-1 ♥",
                 color: "#ef4444",
                 life: 32,
               });
               if (s.missed >= MAX_MISSED) {
-                triggerGameOver("3 FRUITS MISSED!");
+                triggerGameOver("ALL 5 HEARTS LOST!");
               }
             }
             s.fruits.splice(i, 1);
@@ -871,6 +869,25 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
         className="w-full h-full object-contain touch-none"
         style={{ imageRendering: "pixelated" }}
       />
+
+      {/* High-Visibility 5 Hearts Overlay in Top-Left of TV Screen */}
+      <div className="absolute top-3 left-4 z-10 flex items-center gap-1.5 bg-neutral-950/90 border-2 border-red-500 px-2.5 py-1 rounded shadow-[0_0_12px_rgba(239,68,68,0.75)] pointer-events-none">
+        {Array.from({ length: MAX_MISSED }).map((_, idx) => {
+          const alive = idx < heartsLeft;
+          return (
+            <span
+              key={idx}
+              className={`text-sm sm:text-base leading-none transition-all duration-200 ${
+                alive
+                  ? "text-red-500 drop-shadow-[0_0_6px_rgba(239,68,68,0.95)] scale-100"
+                  : "text-neutral-700 scale-90 opacity-50"
+              }`}
+            >
+              ♥
+            </span>
+          );
+        })}
+      </div>
 
       {/* Interactive Game Over Modal Overlay with Prominent Points Feedback & Restart Button */}
       {gamePhase === "gameover" && (

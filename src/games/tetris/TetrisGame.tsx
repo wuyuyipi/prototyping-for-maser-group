@@ -87,7 +87,7 @@ export default function TetrisGame({
     lines: 0,
     level: 1,
     dropCounter: 0,
-    dropInterval: 20,
+    dropInterval: 9,
     hudFlashTimer: 0,
     popups: [] as FloatingPopup[],
     gameOver: false,
@@ -142,82 +142,61 @@ export default function TetrisGame({
     }
   }, []);
 
-  const lockPieceAndCheckLines = useCallback(
-    (isHardDrop = false) => {
-      const state = gameState.current;
-      const pieceX = state.currentPiece.x;
-      const pieceY = state.currentPiece.y;
+  const lockPieceAndCheckLines = useCallback(() => {
+    const state = gameState.current;
+    const pieceY = state.currentPiece.y;
 
-      state.currentPiece.matrix.forEach((row, r) => {
-        row.forEach((cell, c) => {
-          if (cell !== 0) {
-            const by = state.currentPiece.y + r;
-            const bx = state.currentPiece.x + c;
-            if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
-              state.board[by][bx] = state.currentPiece.color;
-            }
+    state.currentPiece.matrix.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        if (cell !== 0) {
+          const by = state.currentPiece.y + r;
+          const bx = state.currentPiece.x + c;
+          if (by >= 0 && by < ROWS && bx >= 0 && bx < COLS) {
+            state.board[by][bx] = state.currentPiece.color;
           }
-        });
-      });
-
-      if (isHardDrop) {
-        const dropPts = 15;
-        state.score += dropPts;
-        state.earnedPts += dropPts;
-        state.hudFlashTimer = 14;
-        setScore(state.score);
-        setEarnedPts(state.earnedPts);
-        onEarnPoints?.(dropPts);
-        state.popups.push({
-          x: 24 + pieceX * 10,
-          y: Math.max(24, 12 + pieceY * 10),
-          text: `+${dropPts}PTS`,
-          color: "#4ade80",
-          life: 28,
-        });
-      }
-
-      // Check line clears
-      let linesCleared = 0;
-      for (let r = ROWS - 1; r >= 0; r--) {
-        if (state.board[r].every((cell) => cell !== 0)) {
-          state.board.splice(r, 1);
-          state.board.unshift(Array(COLS).fill(0));
-          linesCleared++;
-          r++;
         }
+      });
+    });
+
+    // Check line clears (only line clears award points!)
+    let linesCleared = 0;
+    for (let r = ROWS - 1; r >= 0; r--) {
+      if (state.board[r].every((cell) => cell !== 0)) {
+        state.board.splice(r, 1);
+        state.board.unshift(Array(COLS).fill(0));
+        linesCleared++;
+        r++;
       }
+    }
 
-      if (linesCleared > 0) {
-        playSound("tetrisClear");
-        const linePoints = [0, 150, 350, 600, 1000][linesCleared] || 1000;
-        const totalGain = linePoints * state.level;
-        state.score += totalGain;
-        state.earnedPts += totalGain;
-        state.lines += linesCleared;
-        state.level = Math.floor(state.lines / 10) + 1;
-        state.dropInterval = Math.max(5, 20 - (state.level - 1) * 3);
-        state.hudFlashTimer = 25;
+    if (linesCleared > 0) {
+      playSound("tetrisClear");
+      const linePoints = [0, 150, 350, 600, 1000][linesCleared] || 1000;
+      const totalGain = linePoints * state.level;
+      state.score += totalGain;
+      state.earnedPts += totalGain;
+      state.lines += linesCleared;
+      state.level = Math.floor(state.lines / 10) + 1;
+      state.dropInterval = Math.max(3, 9 - (state.level - 1) * 1.5);
+      state.hudFlashTimer = 25;
 
-        setScore(state.score);
-        setEarnedPts(state.earnedPts);
-        setLines(state.lines);
-        setLevel(state.level);
-        onEarnPoints?.(totalGain);
+      setScore(state.score);
+      setEarnedPts(state.earnedPts);
+      setLines(state.lines);
+      setLevel(state.level);
+      onEarnPoints?.(totalGain);
 
-        state.popups.push({
-          x: 26,
-          y: Math.max(36, 12 + pieceY * 10),
-          text: `CLEAR x${linesCleared}! +${totalGain}PTS`,
-          color: "#facc15",
-          life: 45,
-        });
-      }
+      state.popups.push({
+        x: 26,
+        y: Math.max(36, 12 + pieceY * 10),
+        text: `CLEAR x${linesCleared}! +${totalGain}PTS`,
+        color: "#facc15",
+        life: 45,
+      });
+    }
 
-      spawnPiece();
-    },
-    [onEarnPoints, spawnPiece]
-  );
+    spawnPiece();
+  }, [onEarnPoints, spawnPiece]);
 
   const resetGame = useCallback(() => {
     const state = gameState.current;
@@ -227,7 +206,7 @@ export default function TetrisGame({
     state.lines = 0;
     state.level = 1;
     state.gameOver = false;
-    state.dropInterval = 20;
+    state.dropInterval = 9;
     state.dropCounter = 0;
     state.popups = [];
     state.nextPieceKey = getRandomShape();
@@ -283,7 +262,7 @@ export default function TetrisGame({
         }
         playSound("tetrisDrop");
         state.dropCounter = 0;
-        lockPieceAndCheckLines(true);
+        lockPieceAndCheckLines();
       } else if (e.code === "KeyR") {
         e.preventDefault();
         resetGame();
@@ -320,7 +299,7 @@ export default function TetrisGame({
           ) {
             state.currentPiece.y += 1;
           } else {
-            lockPieceAndCheckLines(false);
+            lockPieceAndCheckLines();
           }
         }
       }

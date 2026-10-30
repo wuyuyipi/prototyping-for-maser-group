@@ -656,10 +656,24 @@ export default function SuperPixelBrosGame({
         }
       }
 
-      // Player (Mario sprite)
+      // Player (Mario sprite + "justin" overhead name tag)
       if (player.alive) {
         const px = Math.round(player.x);
         const py = Math.round(player.y);
+
+        // Draw "justin" name tag above Mario's head!
+        ctx.font = "bold 6px 'Press Start 2P', monospace";
+        const nameX = px - 10;
+        const nameY = py - 5;
+        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
+        ctx.fillRect(nameX - 2, nameY - 7, 38, 9);
+        ctx.fillStyle = "#000000";
+        ctx.fillText("justin", nameX - 1, nameY);
+        ctx.fillText("justin", nameX + 1, nameY);
+        ctx.fillText("justin", nameX, nameY - 1);
+        ctx.fillText("justin", nameX, nameY + 1);
+        ctx.fillStyle = "#facc15";
+        ctx.fillText("justin", nameX, nameY);
 
         ctx.save();
         ctx.translate(px, py);
@@ -700,20 +714,23 @@ export default function SuperPixelBrosGame({
         ctx.fillRect(0, 0, 256, 30);
       }
 
+      // Small "JUSTIN'S ADVENTURE" title in Top-Left of TV screen
       ctx.fillStyle = "#ffffff";
+      ctx.font = "5px 'Press Start 2P', monospace";
+      ctx.fillText("JUSTIN'S ADVENTURE", 14, 11);
+
       ctx.font = "7px 'Press Start 2P', monospace";
-      ctx.fillText("MARIO", 10, 12);
       ctx.fillStyle = "#facc15";
-      ctx.fillText(state.score.toString().padStart(6, "0"), 10, 24);
+      ctx.fillText(state.score.toString().padStart(6, "0"), 14, 24);
 
       ctx.fillStyle = "#fde047";
-      ctx.fillText("🪙x" + state.coins.toString().padStart(2, "0"), 84, 24);
+      ctx.fillText("🪙x" + state.coins.toString().padStart(2, "0"), 96, 23);
 
       ctx.fillStyle = state.hudFlashTimer > 0 ? "#ffffff" : "#4ade80";
-      ctx.fillText(`+${state.earnedPts}PTS`, 144, 18);
+      ctx.fillText(`+${state.earnedPts}PTS`, 148, 23);
 
       ctx.fillStyle = "#ffffff";
-      ctx.fillText("1-1", 218, 18);
+      ctx.fillText("1-1", 222, 16);
 
       animId = requestAnimationFrame(gameLoop);
     };
@@ -732,41 +749,57 @@ export default function SuperPixelBrosGame({
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* Interactive Game Over / Course Clear Overlay with Prominent Points Feedback & Restart Button */}
+      {/* Small "JUSTIN'S ADVENTURE" Title Badge in Top-Left of TV Screen */}
+      <div className="absolute top-2.5 left-4 z-10 text-[7px] sm:text-[8px] text-yellow-300 bg-black/75 border border-yellow-400/60 px-2 py-0.5 rounded pointer-events-none tracking-wider shadow-sm">
+        JUSTIN&apos;S ADVENTURE
+      </div>
+
+      {/* Interactive Game Over / Victory Overlay with 2x Larger 360-Spinning Justin Photo */}
       {(gameOver || won) && (
-        <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-3 z-20">
+        <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 z-20">
           <div
             className={`bg-neutral-950 border-4 ${
               won ? "border-yellow-400" : "border-red-500"
-            } px-4 py-3 rounded flex flex-col items-center text-center max-w-[235px] w-full shadow-[0_0_25px_rgba(0,0,0,0.85)] space-y-2`}
+            } px-3 py-2 rounded flex flex-col items-center text-center max-w-[270px] w-full shadow-[0_0_25px_rgba(0,0,0,0.85)] space-y-1.5`}
           >
+            {won && (
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.9)] animate-spin shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/justin_victory.png"
+                  alt="Success Justin"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             <div
-              className={`text-xs sm:text-sm font-bold tracking-wider ${
+              className={`text-[11px] sm:text-xs font-bold tracking-wider ${
                 won ? "text-yellow-300" : "text-red-500"
               }`}
             >
-              {won ? "🏆 COURSE CLEAR!" : "GAME OVER"}
+              {won ? "🏆 SUCCESS JUSTIN!" : "GAME OVER"}
             </div>
 
             {/* Big Prominent Points Earned Banner */}
-            <div className="w-full bg-emerald-950/90 border-2 border-emerald-400 py-1.5 px-2 rounded shadow-[0_0_12px_rgba(52,211,153,0.5)]">
-              <div className="text-[7px] text-emerald-300 uppercase">
+            <div className="w-full bg-emerald-950/90 border-2 border-emerald-400 py-1 px-2 rounded shadow-[0_0_12px_rgba(52,211,153,0.5)]">
+              <div className="text-[6px] text-emerald-300 uppercase">
                 TOTAL POINTS EARNED
               </div>
-              <div className="text-xs sm:text-sm text-yellow-300 font-bold mt-0.5 animate-pulse">
+              <div className="text-xs text-yellow-300 font-bold mt-0.5 animate-pulse">
                 🪙 +{earnedPts} PTS!
               </div>
             </div>
 
-            <div className="text-[8px] text-neutral-300 space-y-0.5">
-              <div>FINAL SCORE: {score}</div>
-              <div className="text-yellow-400">COINS: 🪙 x {coins}</div>
+            <div className="text-[7px] text-neutral-300 flex gap-3">
+              <span>SCORE: {score}</span>
+              <span className="text-yellow-400">COINS: 🪙x{coins}</span>
             </div>
 
             <button
               type="button"
               onClick={restartGame}
-              className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-500 active:translate-y-0.5 text-white font-bold text-[9px] sm:text-[10px] rounded border-2 border-emerald-300 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all"
+              className="w-full py-1.5 px-3 bg-emerald-600 hover:bg-emerald-500 active:translate-y-0.5 text-white font-bold text-[8px] sm:text-[9px] rounded border-2 border-emerald-300 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all"
             >
               🔄 PLAY AGAIN
             </button>

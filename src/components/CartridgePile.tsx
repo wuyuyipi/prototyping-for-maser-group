@@ -51,7 +51,7 @@ export default function CartridgePile({
                 zIndex: 10 + idx,
                 backgroundColor: shellColor,
               }}
-              className={`w-52 sm:w-60 h-10 sm:h-11 rounded-xs border-t border-l border-[#787a82] border-b-2 border-r-2 border-[#222428] flex items-center px-2 cursor-pointer shadow-[0_8px_16px_rgba(0,0,0,0.85)] text-left select-none transition-all duration-150 active:translate-x-1 ${
+              className={`w-46 sm:w-52 md:w-56 h-9 sm:h-10 rounded-xs border-t border-l border-[#787a82] border-b-2 border-r-2 border-[#222428] flex items-center px-2 cursor-pointer shadow-[0_8px_16px_rgba(0,0,0,0.85)] text-left select-none transition-all duration-150 active:translate-x-1 ${
                 isCurrent
                   ? "ring-2 ring-yellow-400 bg-[#5c5f66] -translate-x-1"
                   : "hover:-translate-y-0.5 hover:brightness-110"

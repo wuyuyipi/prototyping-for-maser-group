@@ -9,4 +9,24 @@ export interface ShopItem {
   pixelArtIcon: string;
   labelBadge: string;
   isUnlocked?: boolean;
+
+  // Retro Arcade Land Store Metadata
+  storeName: string;
+  storeSubtitle: string;
+  clerkName: string;
+  clerkGreeting: string;
+  accentColor: string;
+  storeSignIcon: string;
+  landmarkTileIndex: number;
+}
+
+export interface BoardTile {
+  index: number;
+  x: number;
+  y: number;
+  color: string;
+  label?: string;
+  storeId?: string;
+  isStart?: boolean;
+  isExit?: boolean;
 }

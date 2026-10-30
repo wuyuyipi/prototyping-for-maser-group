@@ -54,16 +54,19 @@ export default function CartridgePile({
 
   return (
     <div className="relative flex flex-col justify-end select-none font-pixel pointer-events-auto">
+      {/* Soft table contact shadow beneath the cartridges on the purple cutting mat */}
+      <div className="absolute -bottom-2 inset-x-2 h-4 bg-black/60 rounded-full filter blur-xs pointer-events-none" />
+
       {/* Floating Notice when clicking a locked cartridge */}
       {lockNotice && (
-        <div className="absolute -top-9 right-0 bg-neutral-950/95 border-2 border-amber-400 text-amber-300 px-2.5 py-1 rounded text-[7px] sm:text-[8px] font-bold whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.6)] z-50 animate-bounce">
+        <div className="absolute -top-9 left-0 bg-neutral-950/95 border-2 border-amber-400 text-amber-300 px-2.5 py-1 rounded text-[7px] sm:text-[8px] font-bold whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.6)] z-50 animate-bounce">
           {lockNotice}
         </div>
       )}
 
       {/* Title Tag */}
-      <div className="flex items-center justify-between mb-1.5 text-[7px] text-amber-200/90 px-1 font-bold">
-        <span>GAME CARTRIDGES ({unlockedGameIds.length}/{games.length} UNLOCKED)</span>
+      <div className="flex items-center justify-between mb-1.5 text-[7px] text-amber-200/90 px-1 font-bold relative z-10">
+        <span>CARTRIDGES ({unlockedGameIds.length}/{games.length} UNLOCKED)</span>
         <button
           type="button"
           onClick={onOpenCartridgeSlot}
@@ -74,7 +77,7 @@ export default function CartridgePile({
       </div>
 
       {/* Standing Illustrated Mini-Cartridges on the Desk */}
-      <div className="flex flex-row items-end gap-2 sm:gap-3">
+      <div className="flex flex-row items-end gap-2 sm:gap-3 relative z-10">
         {games.map((game) => {
           const isCurrent = activeGame?.id === game.id;
           const isUnlocked = unlockedGameIds.includes(game.id);

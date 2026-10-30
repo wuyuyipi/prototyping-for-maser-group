@@ -6,7 +6,6 @@ import { GAMES_REGISTRY } from "@/games/registry";
 import { GameDefinition } from "@/games/types";
 import CrtMonitor from "@/components/CrtMonitor";
 import NesConsole from "@/components/NesConsole";
-import NesController from "@/components/NesController";
 import CartridgePile from "@/components/CartridgePile";
 import CartridgeModal from "@/components/CartridgeModal";
 import ShopModal from "@/components/shop/ShopModal";
@@ -19,18 +18,17 @@ export default function RetroLivingRoomPage() {
   const [unlockedGameIds, setUnlockedGameIds] = useState<string[]>(() =>
     GAMES_REGISTRY.filter((g) => g.initiallyUnlocked !== false).map((g) => g.id)
   );
-  // Default to first game or null
+  // Default to first game (Pixel Fruit Ninja)
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  // Initial points set to 0!
+  // Initial points set to 0
   const [playerPoints, setPlayerPoints] = useState<number>(0);
   const [recentPointsGain, setRecentPointsGain] = useState<{
     amount: number;
     id: number;
   } | null>(null);
   const [pointsHighlight, setPointsHighlight] = useState(false);
-  const [showGuide, setShowGuide] = useState(false);
 
   const handleOpenSlot = () => {
     setIsSlotModalOpen(true);
@@ -61,6 +59,11 @@ export default function RetroLivingRoomPage() {
 
   const handlePurchaseGame = (item: ShopItem) => {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
+    // Also unlock the next locked playable cartridge when purchasing in the shop
+    const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
+    if (nextLocked) {
+      setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
+    }
   };
 
   const handleEarnPoints = (pts: number) => {
@@ -76,41 +79,26 @@ export default function RetroLivingRoomPage() {
   return (
     <main className="relative h-screen w-screen overflow-hidden select-none bg-neutral-950 flex flex-col justify-between font-pixel">
       {/* ======================================================================
-          Cozy Room Background (Pixel art dark brick, magenta GAME OVER neon sign)
+          Cozy Room Background (Warm cream wall with art & doodles, purple cutting mat desk)
           ====================================================================== */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/images/retro_room_bg.jpg"
-          alt="Cozy retro living room pixel art background"
+          alt="Cozy retro creative studio room with lilac cutting mat desk and warm doodle wall"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center filter brightness-[0.85] contrast-[1.05]"
+          className="object-cover object-center filter brightness-[0.95] contrast-[1.02]"
         />
-        {/* Soft vignette & ambient neon lighting overlay */}
-        <div className="absolute inset-0 bg-radial-at-c from-transparent via-black/30 to-black/85" />
+        {/* Subtle warm ambient vignette */}
+        <div className="absolute inset-0 bg-radial-at-c from-transparent via-transparent to-black/35" />
       </div>
 
       {/* ======================================================================
-          Top Floating Header: Arcade Marquee, Points, and Shop Button
+          Top Bar: Floating Game Shop Button & Animated Total Points
           ====================================================================== */}
-      <header className="relative z-20 w-full px-4 sm:px-6 py-2.5 flex justify-between items-center text-[8px] sm:text-[9px]">
-        {/* Arcade Status Badge */}
-        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xs px-2.5 py-1.5 rounded border border-neutral-800">
-          <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-          <span className="text-yellow-400 font-bold tracking-wider">
-            RETRO ARCADE SETUP
-          </span>
-          {activeGame && (
-            <span className="text-neutral-400 border-l border-neutral-700 pl-2 hidden sm:inline">
-              LOADED: {activeGame.title}
-            </span>
-          )}
-        </div>
-
-        {/* Action Controls: Shop Button & Team Guide */}
-        <div className="relative flex items-center gap-2 sm:gap-3">
-          {/* Shop Feature Button */}
+      <header className="relative z-30 w-full px-4 sm:px-6 py-2 flex justify-end items-center text-[8px] sm:text-[9px]">
+        <div className="relative flex items-center">
           <button
             type="button"
             onClick={() => {
@@ -147,87 +135,37 @@ export default function RetroLivingRoomPage() {
               +{recentPointsGain.amount} PTS! 🪙
             </div>
           )}
-
-          {/* Team Collaboration Guide */}
-          <button
-            type="button"
-            onClick={() => setShowGuide((v) => !v)}
-            className="bg-black/60 hover:bg-black/80 text-cyan-400 hover:text-cyan-300 px-2.5 py-1.5 rounded border border-cyan-900 cursor-pointer transition-colors"
-          >
-            {showGuide ? "✕ HIDE" : "ℹ DEV GUIDE"}
-          </button>
         </div>
       </header>
 
-      {/* Teammate Guide Modal / Overlay */}
-      {showGuide && (
-        <div className="absolute top-12 right-4 z-40 max-w-sm bg-neutral-950/95 border-2 border-cyan-600 p-3 rounded font-pixel text-[8px] text-neutral-300 space-y-1.5 shadow-2xl backdrop-blur-sm">
-          <div className="text-yellow-300 font-bold border-b border-neutral-800 pb-1">
-            TEAMMATE SETUP INFO
-          </div>
-          <p>
-            • <strong>Branching</strong>: Create branch <code className="text-green-400">feat/game-name</code>
-          </p>
-          <p>
-            • <strong>Your Game Code</strong>: Build inside <code className="text-cyan-400">src/games/your-game/</code> (no games built yet, all blank placeholders).
-          </p>
-          <p>
-            • <strong>Registry</strong>: Register in <code className="text-yellow-400">src/games/registry.ts</code>.
-          </p>
-          <p>
-            • <strong>Shop Feature</strong>: Collaborator builds inside <code className="text-amber-400">src/components/shop/</code>.
-          </p>
-          <p className="text-neutral-500 pt-1">
-            Click anywhere on the background to close this guide.
-          </p>
-          <button
-            type="button"
-            onClick={() => setShowGuide(false)}
-            className="w-full text-center py-1 mt-1 bg-neutral-800 text-neutral-300 hover:bg-neutral-700 cursor-pointer"
-          >
-            DISMISS
-          </button>
+      {/* ======================================================================
+          WORKSPACE SCENE: CRT MONITOR, NES CONSOLE, & CARTRIDGES
+          All resting naturally on the lilac cutting mat desk surface
+          ====================================================================== */}
+      <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-between px-3 sm:px-8 pb-3 pt-0">
+        {/* 1. CRT Monitor: Front and Center */}
+        <div className="w-full flex-1 flex items-center justify-center my-auto min-h-0">
+          <CrtMonitor
+            activeGame={activeGame}
+            onEjectGame={handleEjectGame}
+            onOpenCartridgeSlot={handleOpenSlot}
+            onEarnPoints={handleEarnPoints}
+          />
         </div>
-      )}
 
-      {/* ======================================================================
-          FRONT AND CENTER: The Retro CRT Monitor
-          ====================================================================== */}
-      <section className="relative z-10 w-full flex-1 flex items-center justify-center px-4 -mt-2 sm:mt-0">
-        <CrtMonitor
-          activeGame={activeGame}
-          onEjectGame={handleEjectGame}
-          onOpenCartridgeSlot={handleOpenSlot}
-          onEarnPoints={handleEarnPoints}
-        />
-      </section>
-
-      {/* ======================================================================
-          THE WOODEN DESK SURFACE (BOTTOM OF SCREEN)
-          - Bottom Left: NES Console with interactive Cartridge Slot & Controller
-          - Next to NES: Pile of owned cartridges (not blocking the CRT)
-          ====================================================================== */}
-      <footer className="relative z-20 w-full desk-surface desk-wood-grain px-4 sm:px-8 py-3 pt-4">
-        {/* Soft amber lamp lighting sheen across the desk */}
-        <div className="absolute inset-x-0 top-0 h-1 bg-amber-500/25 pointer-events-none" />
-
-        <div className="max-w-6xl mx-auto flex flex-row items-end justify-between gap-4">
-          {/* Bottom Left: NES Console + Controller */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-3 sm:gap-6">
+        {/* 2. Desk Gear: NES Console & Cartridge Pile resting on the cutting mat */}
+        <div className="w-full max-w-5xl flex flex-row items-end justify-start gap-4 sm:gap-6 relative z-20 shrink-0 -mt-6 sm:-mt-8">
+          {/* Bottom-Left: NES Console resting on the cutting mat */}
+          <div className="flex items-end shrink-0">
             <NesConsole
               activeGame={activeGame}
               isSlotOpen={isSlotModalOpen}
               onOpenCartridgeSlot={handleOpenSlot}
             />
-
-            {/* NES Controller resting on the desk */}
-            <div className="hidden md:block">
-              <NesController />
-            </div>
           </div>
 
-          {/* Next to the NES: Pile of Owned Cartridges */}
-          <div className="flex flex-col items-end sm:items-start">
+          {/* Beside NES (Not blocking CRT): Illustrated Cartridges on the cutting mat */}
+          <div className="flex items-end shrink-0 pb-1">
             <CartridgePile
               games={games}
               activeGame={activeGame}
@@ -239,7 +177,7 @@ export default function RetroLivingRoomPage() {
             />
           </div>
         </div>
-      </footer>
+      </div>
 
       {/* Cartridge Selection Modal (Triggered by clicking the NES cartridge slot) */}
       <CartridgeModal
@@ -257,10 +195,6 @@ export default function RetroLivingRoomPage() {
       <ShopModal
         isOpen={isShopModalOpen}
         playerPoints={playerPoints}
-        games={games}
-        unlockedGameIds={unlockedGameIds}
-        onUnlockGame={handleUnlockGame}
-        onSelectGame={handleSelectGame}
         onClose={() => setIsShopModalOpen(false)}
         onPurchaseGame={handlePurchaseGame}
       />

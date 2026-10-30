@@ -87,7 +87,7 @@ export default function TetrisGame({
     lines: 0,
     level: 1,
     dropCounter: 0,
-    dropInterval: 20,
+    dropInterval: 9,
     hudFlashTimer: 0,
     popups: [] as FloatingPopup[],
     gameOver: false,
@@ -177,7 +177,7 @@ export default function TetrisGame({
       state.earnedPts += totalGain;
       state.lines += linesCleared;
       state.level = Math.floor(state.lines / 10) + 1;
-      state.dropInterval = Math.max(5, 20 - (state.level - 1) * 3);
+      state.dropInterval = Math.max(3, 9 - (state.level - 1) * 1.5);
       state.hudFlashTimer = 25;
 
       setScore(state.score);
@@ -206,7 +206,7 @@ export default function TetrisGame({
     state.lines = 0;
     state.level = 1;
     state.gameOver = false;
-    state.dropInterval = 20;
+    state.dropInterval = 9;
     state.dropCounter = 0;
     state.popups = [];
     state.nextPieceKey = getRandomShape();

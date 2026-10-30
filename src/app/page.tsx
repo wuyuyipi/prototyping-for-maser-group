@@ -22,8 +22,8 @@ export default function RetroLivingRoomPage() {
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  // Initial points set to 400 so user can test buying Pixel Fruits (300 PTS) in the shop or earn more!
-  const [playerPoints, setPlayerPoints] = useState<number>(400);
+  // Initial points set to 1,250 coins
+  const [playerPoints, setPlayerPoints] = useState<number>(1250);
   const [recentPointsGain, setRecentPointsGain] = useState<{
     amount: number;
     id: number;

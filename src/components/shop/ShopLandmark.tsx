@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ShopItem } from "./types";
+import { BOARD_WIDTH, BOARD_HEIGHT } from "./boardPathData";
 
 interface ShopLandmarkProps {
   item?: ShopItem;
@@ -20,28 +21,36 @@ export default function ShopLandmark({
   isPlayerHere,
   onSelect,
 }: ShopLandmarkProps) {
+  // Exact percentage coordinates mapped to the 1000x580 board
+  const leftPercent = (x / BOARD_WIDTH) * 100;
+  const topPercent = (y / BOARD_HEIGHT) * 100;
+
   if (isExit) {
     return (
       <div
         onClick={onSelect}
-        className={`absolute cursor-pointer transition-all duration-200 z-20 group ${
-          isPlayerHere ? "scale-105" : "hover:scale-102"
-        }`}
+        className="absolute cursor-pointer z-20 group"
         style={{
-          left: `${x}px`,
-          top: `${y}px`,
+          left: `${leftPercent}%`,
+          top: `${topPercent}%`,
           transform: "translate(-50%, -50%)",
         }}
-        title="Exit to Living Room"
+        title="Exit to Living Room (End of Path)"
       >
         {isPlayerHere && (
-          <div className="absolute inset-0 -m-2 bg-emerald-500/30 rounded-lg blur-md animate-pulse pointer-events-none" />
+          <div className="absolute inset-0 -m-2 bg-emerald-500/40 rounded-lg blur-md animate-pulse pointer-events-none" />
         )}
 
-        <div className="relative bg-neutral-950/90 border border-emerald-500/80 rounded p-2 text-center w-24 shadow-xl flex flex-col items-center">
-          <div className="bg-emerald-950/80 border border-emerald-500/60 px-2 py-0.5 rounded text-[8px] font-bold text-emerald-300 tracking-wider">
+        {/* Clean End-of-Path Exit Gate */}
+        <div className="relative bg-neutral-950/95 border-2 border-emerald-500 rounded p-1.5 text-center min-w-[76px] shadow-xl flex flex-col items-center group-hover:border-emerald-400 transition-colors">
+          <div className="bg-emerald-950 border border-emerald-400 px-2.5 py-1 rounded text-[8px] font-bold text-emerald-300 tracking-wider">
             EXIT
           </div>
+          {isPlayerHere && (
+            <div className="absolute -top-5 bg-emerald-400 text-neutral-950 text-[6px] font-bold px-1.5 py-0.5 rounded shadow animate-bounce whitespace-nowrap">
+              LEAVE [E]
+            </div>
+          )}
         </div>
       </div>
     );
@@ -52,12 +61,10 @@ export default function ShopLandmark({
   return (
     <div
       onClick={onSelect}
-      className={`absolute cursor-pointer transition-all duration-200 z-20 group ${
-        isPlayerHere ? "scale-105" : "hover:scale-102"
-      }`}
+      className="absolute cursor-pointer z-20 group"
       style={{
-        left: `${x}px`,
-        top: `${y}px`,
+        left: `${leftPercent}%`,
+        top: `${topPercent}%`,
         transform: "translate(-50%, -50%)",
       }}
       title={`Visit ${item.title}`}
@@ -71,7 +78,7 @@ export default function ShopLandmark({
 
       {/* Clean Landmark Card Representing Game Purely by Name */}
       <div
-        className="relative bg-neutral-950/90 border rounded p-2 text-center w-32 shadow-xl flex flex-col items-center"
+        className="relative bg-neutral-950/95 border rounded p-2 text-center w-32 shadow-xl flex flex-col items-center group-hover:brightness-110 transition-all"
         style={{ borderColor: item.accentColor }}
       >
         {/* Game Title Header */}

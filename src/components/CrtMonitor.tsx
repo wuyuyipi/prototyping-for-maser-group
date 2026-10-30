@@ -152,6 +152,12 @@ export default function CrtMonitor({
           </div>
         </div>
       </div>
+
+      {/* TV Pedestal Base / Rubber Feet resting on desk */}
+      <div className="w-48 sm:w-64 h-2.5 bg-[#0e0f12] border-x-2 border-b-2 border-[#08090a] rounded-b-sm shadow-[0_12px_24px_rgba(0,0,0,0.95)] flex justify-between px-8">
+        <div className="w-8 h-1 bg-[#1a1b20] rounded-full mt-0.5" />
+        <div className="w-8 h-1 bg-[#1a1b20] rounded-full mt-0.5" />
+      </div>
     </div>
   );
 }

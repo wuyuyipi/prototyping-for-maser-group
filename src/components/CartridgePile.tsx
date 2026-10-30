@@ -23,8 +23,11 @@ export default function CartridgePile({
 
   return (
     <div className="relative flex flex-col justify-end select-none font-pixel pointer-events-auto">
-      {/* Cartridge Stack: layered on top of each other on the wooden desk surface */}
-      <div className="flex flex-col -space-y-3 sm:-space-y-3.5 max-w-xs sm:max-w-sm mb-1">
+      {/* Soft table contact shadow beneath the cartridge stack on the purple mat */}
+      <div className="absolute -bottom-2 inset-x-2 h-4 bg-black/60 rounded-full filter blur-xs pointer-events-none" />
+
+      {/* Cartridge Stack: layered on top of each other on the cutting mat */}
+      <div className="flex flex-col -space-y-3 sm:-space-y-3.5 max-w-xs sm:max-w-sm mb-1 relative z-10">
         {games.map((game, idx) => {
           const isCurrent = activeGame?.id === game.id;
           return (
@@ -37,15 +40,15 @@ export default function CartridgePile({
                 type="button"
                 onClick={() => handleSelect(game)}
                 title={`Load ${game.title} into NES`}
-                className={`w-52 sm:w-60 h-9 sm:h-10 bg-[#424045] hover:bg-[#525057] rounded-xs pixel-border-sm flex items-center px-2 cursor-pointer shadow-[0_10px_18px_rgba(0,0,0,0.92)] text-left select-none active:translate-x-1 ${
-                  isCurrent ? "ring-2 ring-yellow-500/90 bg-[#525057]" : ""
+                className={`w-52 sm:w-60 h-9 sm:h-10 bg-[#54565c] hover:bg-[#62646c] rounded-xs border-t border-l border-[#787a82] border-b-2 border-r-2 border-[#2b2c30] flex items-center px-2 cursor-pointer shadow-[0_8px_16px_rgba(0,0,0,0.85)] text-left select-none active:translate-x-1 ${
+                  isCurrent ? "ring-2 ring-yellow-400 bg-[#62646c]" : ""
                 }`}
               >
                 {/* Left Grip Ridges */}
                 <div className="flex gap-[2px] mr-2 shrink-0">
-                  <div className="w-[2px] h-5 bg-[#252329]" />
-                  <div className="w-[2px] h-5 bg-[#252329]" />
-                  <div className="w-[2px] h-5 bg-[#252329]" />
+                  <div className="w-[2px] h-5 bg-[#323337]" />
+                  <div className="w-[2px] h-5 bg-[#323337]" />
+                  <div className="w-[2px] h-5 bg-[#323337]" />
                 </div>
 
                 {/* Spine Label with rich ambient-lit color */}
@@ -60,7 +63,7 @@ export default function CartridgePile({
                     </span>
                   </div>
                   {isCurrent && (
-                    <span className="text-[6px] text-yellow-300 ml-1 shrink-0 bg-black/70 px-1 py-0.2">
+                    <span className="text-[6px] text-yellow-300 ml-1 shrink-0 bg-black/80 px-1 py-0.5 rounded-xs">
                       IN NES
                     </span>
                   )}
@@ -68,8 +71,8 @@ export default function CartridgePile({
 
                 {/* Right Grip Ridges */}
                 <div className="flex gap-[2px] ml-2 shrink-0">
-                  <div className="w-[2px] h-5 bg-[#252329]" />
-                  <div className="w-[2px] h-5 bg-[#252329]" />
+                  <div className="w-[2px] h-5 bg-[#323337]" />
+                  <div className="w-[2px] h-5 bg-[#323337]" />
                 </div>
               </button>
             </div>

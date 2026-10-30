@@ -22,8 +22,8 @@ export default function RetroLivingRoomPage() {
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  // Initial points set to 0
-  const [playerPoints, setPlayerPoints] = useState<number>(0);
+  // Initial points set to 1,250 coins
+  const [playerPoints, setPlayerPoints] = useState<number>(1250);
   const [recentPointsGain, setRecentPointsGain] = useState<{
     amount: number;
     id: number;
@@ -59,11 +59,9 @@ export default function RetroLivingRoomPage() {
 
   const handlePurchaseGame = (item: ShopItem) => {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
-    // Also unlock the next locked playable cartridge when purchasing in the shop
-    const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
-    if (nextLocked) {
-      setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
-    }
+    setUnlockedGameIds((prev) =>
+      prev.includes(item.id) ? prev : [...prev, item.id]
+    );
   };
 
   const handleEarnPoints = (pts: number) => {
@@ -195,6 +193,7 @@ export default function RetroLivingRoomPage() {
       <ShopModal
         isOpen={isShopModalOpen}
         playerPoints={playerPoints}
+        unlockedGameIds={unlockedGameIds}
         onClose={() => setIsShopModalOpen(false)}
         onPurchaseGame={handlePurchaseGame}
       />

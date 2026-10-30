@@ -173,6 +173,53 @@ export default function CartridgeArt({
     );
   }
 
+  if (gameId === "pixel-pinball-88" || gameId === "pinball") {
+    // 🕹️ PIXEL PINBALL 88: Orange arcade cabinet glow, bumpers, flippers & silver pinball
+    return (
+      <div
+        className={`relative w-full ${
+          compact ? "h-14 sm:h-16" : "h-28 sm:h-32"
+        } bg-[#1a0800] overflow-hidden border-2 border-[#ea580c] flex items-center justify-center select-none`}
+      >
+        <svg
+          viewBox="0 0 80 48"
+          className="w-full h-full relative z-10"
+          shapeRendering="crispEdges"
+        >
+          {/* Table Outline & Guide Rails */}
+          <polygon points="16,0 64,0 60,48 20,48" fill="#2d1204" />
+          <line x1="20" y1="0" x2="23" y2="48" stroke="#7c2d12" strokeWidth="2" />
+          <line x1="60" y1="0" x2="57" y2="48" stroke="#7c2d12" strokeWidth="2" />
+
+          {/* Top Neon Bumpers */}
+          <circle cx="32" cy="14" r="5" fill="#f97316" stroke="#fdba74" strokeWidth="1" />
+          <circle cx="48" cy="14" r="5" fill="#f97316" stroke="#fdba74" strokeWidth="1" />
+          <circle cx="40" cy="22" r="5" fill="#ef4444" stroke="#fca5a5" strokeWidth="1" />
+
+          {/* Bumper Centers */}
+          <rect x="31" y="13" width="2" height="2" fill="#ffffff" />
+          <rect x="47" y="13" width="2" height="2" fill="#ffffff" />
+          <rect x="39" y="21" width="2" height="2" fill="#ffffff" />
+
+          {/* Left & Right Slingshots */}
+          <polygon points="23,28 29,36 24,38" fill="#f59e0b" />
+          <polygon points="57,28 51,36 56,38" fill="#f59e0b" />
+
+          {/* Flippers at the Bottom */}
+          <polygon points="26,42 37,45 36,47 25,44" fill="#fbbf24" stroke="#d97706" strokeWidth="0.5" />
+          <polygon points="54,42 43,45 44,47 55,44" fill="#fbbf24" stroke="#d97706" strokeWidth="0.5" />
+
+          {/* Silver Pinball */}
+          <circle cx="38" cy="33" r="3" fill="#e2e8f0" stroke="#94a3b8" strokeWidth="0.5" />
+          <rect x="37" y="32" width="1" height="1" fill="#ffffff" />
+
+          {/* 88 Arcade Saloon Neon Header */}
+          <text x="40" y="7" textAnchor="middle" fill="#facc15" fontSize="5" fontWeight="bold" fontFamily="monospace">PINBALL 88</text>
+        </svg>
+      </div>
+    );
+  }
+
   // 🧱 TETRIS: Deep Navy Matrix Grid + Falling & Stacked Colorful Tetromino Blocks
   return (
     <div

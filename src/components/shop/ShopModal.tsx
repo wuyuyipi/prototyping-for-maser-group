@@ -15,6 +15,7 @@ import AvatarSelectModal from "./AvatarSelectModal";
 interface ShopModalProps {
   isOpen: boolean;
   playerPoints: number;
+  unlockedGameIds?: string[];
   onClose: () => void;
   onPurchaseGame?: (item: ShopItem) => void;
 }
@@ -22,13 +23,31 @@ interface ShopModalProps {
 export default function ShopModal({
   isOpen,
   playerPoints,
+  unlockedGameIds,
   onClose,
   onPurchaseGame,
 }: ShopModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   // Shop items state (tracks which are unlocked)
-  const [shopItems, setShopItems] = useState<ShopItem[]>(INITIAL_SHOP_ITEMS);
+  const [shopItems, setShopItems] = useState<ShopItem[]>(() =>
+    INITIAL_SHOP_ITEMS.map((item) => ({
+      ...item,
+      isUnlocked: item.isUnlocked || (unlockedGameIds?.includes(item.id) ?? false),
+    }))
+  );
+
+  // Keep unlocked state in sync if unlockedGameIds prop changes
+  useEffect(() => {
+    if (unlockedGameIds) {
+      setShopItems((prev) =>
+        prev.map((item) => ({
+          ...item,
+          isUnlocked: item.isUnlocked || unlockedGameIds.includes(item.id),
+        }))
+      );
+    }
+  }, [unlockedGameIds]);
 
   // Avatar Selection state (defaults to Spike the Dino Kaiju)
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>("dino");
@@ -43,8 +62,8 @@ export default function ShopModal({
   const [inspectingItem, setInspectingItem] = useState<ShopItem | null>(null);
   const [isExitDialogOpen, setIsExitDialogOpen] = useState<boolean>(false);
 
-  // Roll result banner
-  const [lastRoll, setLastRoll] = useState<number | null>(null);
+  // Active movement timer ref
+  const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Current avatar definition
   const activeAvatar =
@@ -65,84 +84,104 @@ export default function ShopModal({
   // Current tile data
   const currentTile: BoardTile = BOARD_TILES[currentTileIndex] || BOARD_TILES[0];
 
-  // Map stores to their landmark tiles
+  // Map stores to their landmark tiles (Integrated with actual arcade games)
   const landmarkStoreMap: Record<number, ShopItem> = {
-    5: shopItems.find((i) => i.id === "shop-game-1")!,
-    11: shopItems.find((i) => i.id === "shop-game-2")!,
-    21: shopItems.find((i) => i.id === "shop-game-3")!,
-    26: shopItems.find((i) => i.id === "shop-game-4")!,
+    5: shopItems.find((i) => i.id === "super-pixel-bros")!,
+    11: shopItems.find((i) => i.id === "tetris")!,
+    21: shopItems.find((i) => i.id === "fruit-ninja")!,
+    26: shopItems.find((i) => i.id === "pixel-pinball-88")!,
   };
 
   // Close handler
   const handleClose = () => {
     playSound("blip");
+    if (moveIntervalRef.current) {
+      clearInterval(moveIntervalRef.current);
+      moveIntervalRef.current = null;
+    }
+    setIsMoving(false);
     setInspectingItem(null);
     setIsExitDialogOpen(false);
     setIsAvatarModalOpen(false);
     onClose();
   };
 
-  // Move avatar to a specific target tile step-by-step
+  // Move avatar to a specific target tile step-by-step along the path
   const moveToTile = useCallback(
     (targetIndex: number) => {
-      if (isMoving) return;
       const clampedTarget = Math.max(0, Math.min(BOARD_TILES.length - 1, targetIndex));
-      if (clampedTarget === currentTileIndex) {
-        if (landmarkStoreMap[clampedTarget]) {
-          setInspectingItem(landmarkStoreMap[clampedTarget]);
-        } else if (clampedTarget === BOARD_TILES.length - 1) {
-          setIsExitDialogOpen(true);
-        }
-        return;
+
+      // Clear any in-flight stepping interval so new click immediately redirects
+      if (moveIntervalRef.current) {
+        clearInterval(moveIntervalRef.current);
+        moveIntervalRef.current = null;
       }
 
-      setIsMoving(true);
-      setFacingLeft(clampedTarget < currentTileIndex);
-
-      const stepDirection = clampedTarget > currentTileIndex ? 1 : -1;
-      let nextIndex = currentTileIndex;
-
-      const intervalId = setInterval(() => {
-        nextIndex += stepDirection;
-        setCurrentTileIndex(nextIndex);
-        playSound("blip");
-
-        if (nextIndex === clampedTarget) {
-          clearInterval(intervalId);
+      setCurrentTileIndex((currentIdx) => {
+        if (clampedTarget === currentIdx) {
           setIsMoving(false);
-
           if (landmarkStoreMap[clampedTarget]) {
-            setTimeout(() => {
-              setInspectingItem(landmarkStoreMap[clampedTarget]);
-            }, 250);
+            setInspectingItem(landmarkStoreMap[clampedTarget]);
           } else if (clampedTarget === BOARD_TILES.length - 1) {
-            setTimeout(() => {
-              setIsExitDialogOpen(true);
-            }, 250);
+            setIsExitDialogOpen(true);
           }
+          return currentIdx;
         }
-      }, 120);
+
+        setIsMoving(true);
+        setFacingLeft(clampedTarget < currentIdx);
+
+        const stepDirection = clampedTarget > currentIdx ? 1 : -1;
+        let nextIndex = currentIdx;
+
+        // Normal, natural walking pace (260ms per spot)
+        moveIntervalRef.current = setInterval(() => {
+          nextIndex += stepDirection;
+          setCurrentTileIndex(nextIndex);
+          playSound("blip");
+
+          if (nextIndex === clampedTarget) {
+            if (moveIntervalRef.current) {
+              clearInterval(moveIntervalRef.current);
+              moveIntervalRef.current = null;
+            }
+            setIsMoving(false);
+
+            if (landmarkStoreMap[clampedTarget]) {
+              setTimeout(() => {
+                setInspectingItem(landmarkStoreMap[clampedTarget]);
+              }, 220);
+            } else if (clampedTarget === BOARD_TILES.length - 1) {
+              setTimeout(() => {
+                setIsExitDialogOpen(true);
+              }, 220);
+            }
+          }
+        }, 260);
+
+        return currentIdx;
+      });
     },
-    [currentTileIndex, isMoving, landmarkStoreMap]
+    [landmarkStoreMap]
   );
 
-  // Candy Land Style "Roll" Action
-  const handleRollDice = () => {
-    if (isMoving) return;
-    const roll = Math.floor(Math.random() * 4) + 1; // 1 to 4 steps
-    setLastRoll(roll);
-    playSound("coin");
-    moveToTile(currentTileIndex + roll);
-  };
+  // Cleanup movement interval on unmount
+  useEffect(() => {
+    return () => {
+      if (moveIntervalRef.current) {
+        clearInterval(moveIntervalRef.current);
+      }
+    };
+  }, []);
 
-  // Step Forward
+  // Step Forward 1 Spot
   const handleStepForward = () => {
     if (currentTileIndex < BOARD_TILES.length - 1) {
       moveToTile(currentTileIndex + 1);
     }
   };
 
-  // Step Backward
+  // Step Backward 1 Spot
   const handleStepBackward = () => {
     if (currentTileIndex > 0) {
       moveToTile(currentTileIndex - 1);
@@ -178,9 +217,6 @@ export default function ShopModal({
       } else if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
         e.preventDefault();
         handleStepBackward();
-      } else if (e.key === " " || e.key === "Enter") {
-        e.preventDefault();
-        handleRollDice();
       } else if (e.key === "e" || e.key === "E") {
         e.preventDefault();
         if (landmarkStoreMap[currentTileIndex]) {
@@ -202,7 +238,6 @@ export default function ShopModal({
     landmarkStoreMap,
     handleStepForward,
     handleStepBackward,
-    handleRollDice,
   ]);
 
   const unlockedCount = shopItems.filter((i) => i.isUnlocked).length;
@@ -217,7 +252,9 @@ export default function ShopModal({
     >
       {/* ======================================================================
           ONE SEAMLESS MAP VIEW
-          No extra borders, no extra text, zero emojis.
+          - Avatar walks strictly on the path tiles
+          - Click any spot to move directly there
+          - Exit sits directly at the end of the path
           ====================================================================== */}
       <div className="relative w-full aspect-[1000/580] bg-[#0c0915] overflow-hidden">
         {/* Ambient Map Grid & Lighting */}
@@ -261,84 +298,145 @@ export default function ShopModal({
             className="opacity-75"
           />
 
-          {/* Stepping Tiles */}
+          {/* Stepping Spots: Pure colorful stones with zero numbers or text, ending at EXIT */}
           {BOARD_TILES.map((tile) => {
             const isCurrent = tile.index === currentTileIndex;
             return (
               <g
                 key={tile.index}
-                className="cursor-pointer pointer-events-auto transition-transform hover:scale-110"
+                className="cursor-pointer pointer-events-auto group"
                 onClick={() => moveToTile(tile.index)}
               >
-                {/* Tile Drop Shadow */}
+                {/* Large Invisible Hit Target for effortless clicking */}
                 <rect
-                  x={tile.x - 17}
-                  y={tile.y - 12 + 3}
-                  width="34"
-                  height="24"
-                  rx="4"
-                  fill="#000000"
-                  opacity="0.5"
+                  x={tile.x - 26}
+                  y={tile.y - 18}
+                  width="52"
+                  height="36"
+                  fill="transparent"
                 />
 
-                {/* Tile Body */}
-                <rect
-                  x={tile.x - 17}
-                  y={tile.y - 12}
-                  width="34"
-                  height="24"
-                  rx="4"
-                  fill={tile.color}
-                  stroke={isCurrent ? "#fde047" : "#0d0916"}
-                  strokeWidth={isCurrent ? "2.5" : "1"}
-                  className={isCurrent ? "filter drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]" : ""}
-                />
+                {tile.isExit ? (
+                  /* Authentic End-of-Path EXIT Tile */
+                  <g>
+                    {/* Outer Green Border Box */}
+                    <rect
+                      x={tile.x - 26}
+                      y={tile.y - 15}
+                      width="52"
+                      height="30"
+                      rx="6"
+                      fill="#064e3b"
+                      stroke={isCurrent ? "#fde047" : "#10b981"}
+                      strokeWidth={isCurrent ? "2.5" : "2"}
+                      className={
+                        isCurrent
+                          ? "filter drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]"
+                          : "group-hover:stroke-emerald-400"
+                      }
+                    />
+                    {/* Inner Green Border Box */}
+                    <rect
+                      x={tile.x - 20}
+                      y={tile.y - 10}
+                      width="40"
+                      height="20"
+                      rx="4"
+                      fill="#022c22"
+                      stroke="#34d399"
+                      strokeWidth="1.5"
+                    />
+                    {/* EXIT Text */}
+                    <text
+                      x={tile.x}
+                      y={tile.y + 4}
+                      textAnchor="middle"
+                      fill="#6ee7b7"
+                      fontSize="9"
+                      fontWeight="bold"
+                      fontFamily="monospace"
+                      letterSpacing="1"
+                    >
+                      EXIT
+                    </text>
+                  </g>
+                ) : (
+                  <>
+                    {/* Tile Drop Shadow (Firmly grounded) */}
+                    <rect
+                      x={tile.x - 17}
+                      y={tile.y - 12 + 3}
+                      width="34"
+                      height="24"
+                      rx="4"
+                      fill="#000000"
+                      opacity="0.5"
+                    />
 
-                {/* Bevel Highlight */}
-                <rect
-                  x={tile.x - 15}
-                  y={tile.y - 10}
-                  width="30"
-                  height="4"
-                  rx="2"
-                  fill="#ffffff"
-                  opacity="0.3"
-                />
+                    {/* Tile Body (Stationary, subtle highlight on hover) */}
+                    <rect
+                      x={tile.x - 17}
+                      y={tile.y - 12}
+                      width="34"
+                      height="24"
+                      rx="4"
+                      fill={tile.color}
+                      stroke={isCurrent ? "#fde047" : "#0d0916"}
+                      strokeWidth={isCurrent ? "2.5" : "1"}
+                      className={`transition-opacity ${
+                        isCurrent
+                          ? "filter drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]"
+                          : "group-hover:opacity-90"
+                      }`}
+                    />
+
+                    {/* Bevel Highlight */}
+                    <rect
+                      x={tile.x - 15}
+                      y={tile.y - 10}
+                      width="30"
+                      height="4"
+                      rx="2"
+                      fill="#ffffff"
+                      opacity="0.3"
+                    />
+                  </>
+                )}
               </g>
             );
           })}
         </svg>
 
-        {/* HTML Landmark Stores & Avatar */}
+        {/* HTML Landmark Stores & Avatar Layer */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
-          {/* Store 1: Cyber Samurai (Tile 5) */}
+          {/* Store 1: Super Pixel Bros. (Tile 5) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[5]}
-              x={105}
-              y={110}
+              x={75}
+              y={135}
               isPlayerHere={currentTileIndex === 5}
               onSelect={() => moveToTile(5)}
             />
           </div>
 
-          {/* Store 2: Galactic Mining (Tile 11) */}
+          {/* Store 2: Tetris (Tile 11) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[11]}
-              x={590}
+              x={585}
               y={95}
               isPlayerHere={currentTileIndex === 11}
               onSelect={() => moveToTile(11)}
             />
           </div>
 
-          {/* Store 3: Chrono Wizard (Tile 21) */}
+          {/* Store 3: Pixel Fruit Ninja (Tile 21) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[21]}
-              x={795}
-              y={480}
+              x={775}
+              y={460}
               isPlayerHere={currentTileIndex === 21}
               onSelect={() => moveToTile(21)}
             />
@@ -348,25 +446,14 @@ export default function ShopModal({
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[26]}
-              x={775}
-              y={40}
+              x={765}
+              y={45}
               isPlayerHere={currentTileIndex === 26}
               onSelect={() => moveToTile(26)}
             />
           </div>
 
-          {/* Exit Portal: Living Room (Tile 29) */}
-          <div className="pointer-events-auto">
-            <ShopLandmark
-              isExit
-              x={920}
-              y={325}
-              isPlayerHere={currentTileIndex === 29}
-              onSelect={() => moveToTile(29)}
-            />
-          </div>
-
-          {/* Player Monster Avatar Pawn */}
+          {/* Player Monster Avatar Pawn (Locked directly onto the path via percentage coordinates) */}
           <ShopAvatar
             avatarId={selectedAvatarId}
             x={currentTile.x}
@@ -378,7 +465,6 @@ export default function ShopModal({
 
         {/* ====================================================================
             FLOATING MINIMAL HUD (Top Controls)
-            No container borders or extra text
             ==================================================================== */}
         <div className="absolute top-3 left-4 right-4 flex justify-between items-center z-40 pointer-events-none">
           {/* Minimal Map Title */}
@@ -432,67 +518,30 @@ export default function ShopModal({
         </div>
 
         {/* ====================================================================
-            FLOATING MINIMAL CONTROLS (Bottom Controls)
-            Floating directly on map floor without boxed panels or helper texts
+            CONTEXTUAL BOTTOM ACTION
+            Appears seamlessly when standing on a Game or the Exit
             ==================================================================== */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40">
-          {/* Step Back */}
-          <button
-            type="button"
-            onClick={handleStepBackward}
-            disabled={isMoving || currentTileIndex === 0}
-            className="px-3 py-1.5 bg-neutral-950/85 hover:bg-neutral-900 border border-neutral-700 disabled:opacity-30 text-neutral-300 text-[8px] font-bold rounded cursor-pointer transition-all active:translate-y-0.5 shadow"
-          >
-            BACK
-          </button>
+        {(currentStore || currentTile.isExit) && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40">
+            {currentStore && (
+              <button
+                type="button"
+                onClick={() => setInspectingItem(currentStore)}
+                className="px-4 py-2 bg-yellow-500 hover:bg-yellow-400 text-neutral-950 text-[9px] font-bold rounded cursor-pointer shadow-lg animate-pulse"
+              >
+                ENTER {currentStore.title.toUpperCase()}
+              </button>
+            )}
 
-          {/* Roll & Hop */}
-          <button
-            type="button"
-            onClick={handleRollDice}
-            disabled={isMoving || currentTileIndex === BOARD_TILES.length - 1}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-30 text-neutral-950 text-[9px] font-bold rounded cursor-pointer shadow active:translate-y-0.5 transition-all"
-          >
-            ROLL (1-4)
-          </button>
-
-          {/* Step Forward */}
-          <button
-            type="button"
-            onClick={handleStepForward}
-            disabled={isMoving || currentTileIndex === BOARD_TILES.length - 1}
-            className="px-3 py-1.5 bg-neutral-950/85 hover:bg-neutral-900 border border-neutral-700 disabled:opacity-30 text-neutral-300 text-[8px] font-bold rounded cursor-pointer transition-all active:translate-y-0.5 shadow"
-          >
-            FORWARD
-          </button>
-
-          {/* Context Action: Enter Store */}
-          {currentStore && (
-            <button
-              type="button"
-              onClick={() => setInspectingItem(currentStore)}
-              className="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-neutral-950 text-[8px] font-bold rounded cursor-pointer animate-pulse shadow ml-1"
-            >
-              ENTER {currentStore.title.toUpperCase()}
-            </button>
-          )}
-
-          {/* Context Action: Exit */}
-          {currentTile.isExit && (
-            <button
-              type="button"
-              onClick={() => setIsExitDialogOpen(true)}
-              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 text-[8px] font-bold rounded cursor-pointer animate-pulse shadow ml-1"
-            >
-              EXIT
-            </button>
-          )}
-        </div>
-
-        {/* Minimal Roll Banner */}
-        {lastRoll && (
-          <div className="absolute top-12 left-1/2 -translate-x-1/2 bg-yellow-400 text-neutral-950 font-bold px-2.5 py-1 rounded shadow text-[7px] animate-bounce z-40">
-            ROLLED {lastRoll}
+            {currentTile.isExit && (
+              <button
+                type="button"
+                onClick={() => setIsExitDialogOpen(true)}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-neutral-950 text-[9px] font-bold rounded cursor-pointer shadow-lg animate-pulse"
+              >
+                EXIT TO LIVING ROOM
+              </button>
+            )}
           </div>
         )}
       </div>

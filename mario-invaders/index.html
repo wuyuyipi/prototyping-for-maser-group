@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mario Invaders - 16-Bit Retro Arcade</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: radial-gradient(circle at center, #1e1b4b 0%, #09090b 100%);
+      color: #ffffff;
+      font-family: 'Press Start 2P', monospace, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* Cabinet / Monitor Wrapper */
+    .arcade-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      background: #18181b;
+      border: 4px solid #3f3f46;
+      border-radius: 16px;
+      box-shadow: 0 0 35px rgba(0, 0, 0, 0.9), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+      max-width: 95vw;
+      max-height: 95vh;
+    }
+
+    .crt-screen-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 3px solid #09090b;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 4:3 Aspect Ratio Canvas */
+    canvas#gameCanvas {
+      display: block;
+      width: min(80vw, calc(80vh * 4 / 3));
+      height: min(calc(80vw * 3 / 4), 80vh);
+      max-width: 640px;
+      max-height: 480px;
+      aspect-ratio: 4 / 3;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Subtle CRT Scanlines & Glass Glow Overlay */
+    .crt-screen-container::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                  linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background-size: 100% 4px, 6px 100%;
+      border-radius: 8px;
+    }
+
+    /* Vintage Screen Curved Vignette */
+    .crt-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+      border-radius: 8px;
+    }
+
+    /* Footer Info */
+    .arcade-footer {
+      margin-top: 8px;
+      font-size: 9px;
+      color: #a1a1aa;
+      text-align: center;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .key-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #27272a;
+      border: 1px solid #52525b;
+      border-radius: 4px;
+      color: #fbbf24;
+      font-size: 8px;
+    }
+
+    /* Touch Controls (shown on touch devices) */
+    .touch-controls {
+      display: none;
+      width: 100%;
+      margin-top: 10px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    @media (hover: none) and (pointer: coarse), (max-width: 640px) {
+      .touch-controls {
+        display: flex;
+      }
+      canvas#gameCanvas {
+        width: min(92vw, calc(65vh * 4 / 3));
+        height: min(calc(92vw * 3 / 4), 65vh);
+      }
+    }
+
+    .dpad-group, .action-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .touch-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #27272a;
+      border: 3px solid #52525b;
+      color: #f43f5e;
+      font-size: 18px;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #18181b;
+      touch-action: manipulation;
+    }
+
+    .touch-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #18181b;
+      background: #3f3f46;
+    }
+
+    .touch-btn-fire {
+      width: 62px;
+      height: 62px;
+      background: #dc2626;
+      border-color: #ef4444;
+      color: #ffffff;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+  <div class="arcade-wrapper">
+    <div class="crt-screen-container">
+      <canvas id="gameCanvas" width="480" height="360"></canvas>
+      <div class="crt-vignette"></div>
+    </div>
+
+    <div class="arcade-footer">
+      <span><span class="key-badge">←</span> <span class="key-badge">→</span> / <span class="key-badge">A</span> <span class="key-badge">D</span> Move</span>
+      <span><span class="key-badge">SPACE</span> Fire</span>
+      <span><span class="key-badge">P</span> Pause</span>
+      <span><span class="key-badge">M</span> Audio</span>
+    </div>
+
+    <!-- On-screen Touch Controls for mobile/tablets -->
+    <div class="touch-controls" id="touchControls">
+      <div class="dpad-group">
+        <button class="touch-btn" id="btnLeft" aria-label="Left">◀</button>
+        <button class="touch-btn" id="btnRight" aria-label="Right">▶</button>
+      </div>
+      <div class="action-group">
+        <button class="touch-btn" id="btnPause" style="font-size: 9px; width:46px; height:46px;">⏸</button>
+        <button class="touch-btn touch-btn-fire" id="btnFire" aria-label="Fire">FIRE</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

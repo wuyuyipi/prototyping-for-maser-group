@@ -15,11 +15,11 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "super-pixel-bros",
     title: "Super Pixel Bros.",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1985,
     genre: "Platformer",
     description:
-      "Control Justin! Headbutt question blocks, stomp Goomba mushrooms, climb the stairs, and reach the flagpole!",
+      "Headbutt question blocks, stomp Goomba mushrooms, climb the stairs, and reach the flagpole!",
     instructions:
       "Left/Right or A/D to run, Space or Up to jump, R to restart.",
     cartridgeColor: "#991b1b",
@@ -35,7 +35,7 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "tetris",
     title: "Tetris",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1989,
     genre: "Block Puzzle",
     description:
@@ -55,7 +55,7 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "fruit-ninja",
     title: "Pixel Fruit Ninja",
-    author: "Mingtai",
+    author: "Retro Arcade",
     year: 1987,
     genre: "Dojo Slasher",
     description:

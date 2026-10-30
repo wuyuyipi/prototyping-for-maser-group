@@ -95,7 +95,7 @@ export default function CartridgeArt({
   }
 
   if (gameId === "super-pixel-bros") {
-    // 🍄 SUPER PIXEL BROS: Blue Sky, Question Block, Brick, Mario (justin), Goomba, Green Pipe & Flagpole
+    // 🍄 SUPER PIXEL BROS: Blue Sky, Question Block, Brick, Mario, Goomba, Green Pipe & Flagpole
     return (
       <div
         className={`relative w-full ${
@@ -131,11 +131,8 @@ export default function CartridgeArt({
           {/* Popping Coin above ? Block */}
           <rect x="36" y="2" width="4" height="5" fill="#fef08a" />
 
-          {/* Mario ("justin") Jumping */}
+          {/* Mario Jumping */}
           <g transform="translate(24, 21)">
-            {/* Name tag "justin" */}
-            <rect x="-2" y="-5" width="16" height="4" fill="#000000" />
-            <rect x="0" y="-4" width="12" height="2" fill="#facc15" />
             {/* Red Cap & Shirt */}
             <rect x="2" y="0" width="7" height="3" fill="#f83800" />
             <rect x="1" y="3" width="7" height="3" fill="#fcb438" />

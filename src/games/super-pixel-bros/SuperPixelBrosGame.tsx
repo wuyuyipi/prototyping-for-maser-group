@@ -656,24 +656,10 @@ export default function SuperPixelBrosGame({
         }
       }
 
-      // Player (Mario sprite + "justin" overhead name tag)
+      // Player (Mario sprite)
       if (player.alive) {
         const px = Math.round(player.x);
         const py = Math.round(player.y);
-
-        // Draw "justin" name tag above Mario's head!
-        ctx.font = "bold 6px 'Press Start 2P', monospace";
-        const nameX = px - 10;
-        const nameY = py - 5;
-        ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
-        ctx.fillRect(nameX - 2, nameY - 7, 38, 9);
-        ctx.fillStyle = "#000000";
-        ctx.fillText("justin", nameX - 1, nameY);
-        ctx.fillText("justin", nameX + 1, nameY);
-        ctx.fillText("justin", nameX, nameY - 1);
-        ctx.fillText("justin", nameX, nameY + 1);
-        ctx.fillStyle = "#facc15";
-        ctx.fillText("justin", nameX, nameY);
 
         ctx.save();
         ctx.translate(px, py);
@@ -716,7 +702,7 @@ export default function SuperPixelBrosGame({
 
       ctx.fillStyle = "#ffffff";
       ctx.font = "7px 'Press Start 2P', monospace";
-      ctx.fillText("JUSTIN", 10, 12);
+      ctx.fillText("MARIO", 10, 12);
       ctx.fillStyle = "#facc15";
       ctx.fillText(state.score.toString().padStart(6, "0"), 10, 24);
 
@@ -782,7 +768,7 @@ export default function SuperPixelBrosGame({
               onClick={restartGame}
               className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-500 active:translate-y-0.5 text-white font-bold text-[9px] sm:text-[10px] rounded border-2 border-emerald-300 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all"
             >
-              🔄 重新开始 / PLAY AGAIN
+              🔄 PLAY AGAIN
             </button>
           </div>
         </div>

@@ -140,41 +140,46 @@ export default function RetroLivingRoomPage() {
 
       {/* ======================================================================
           WORKSPACE SCENE: CRT MONITOR, NES CONSOLE, & CARTRIDGES
-          All resting naturally on the lilac cutting mat desk surface
+          Arranged per user reference layout diagram:
+          - CRT: Large, front and center on the desk
+          - NES: Bottom-left, overlapping bottom-left corner of the CRT bezel
+          - Cartridges: Bottom-right, stacked horizontally on the desk
           ====================================================================== */}
-      <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-between px-3 sm:px-8 pb-3 pt-0">
-        {/* 1. CRT Monitor: Front and Center */}
-        <div className="w-full flex-1 flex items-center justify-center my-auto min-h-0">
-          <CrtMonitor
-            activeGame={activeGame}
-            onEjectGame={handleEjectGame}
-            onOpenCartridgeSlot={handleOpenSlot}
-            onEarnPoints={handleEarnPoints}
-          />
-        </div>
-
-        {/* 2. Desk Gear: NES Console & Cartridge Pile resting on the cutting mat */}
-        <div className="w-full max-w-5xl flex flex-row items-end justify-start gap-4 sm:gap-6 relative z-20 shrink-0 -mt-6 sm:-mt-8">
-          {/* Bottom-Left: NES Console resting on the cutting mat */}
-          <div className="flex items-end shrink-0">
-            <NesConsole
+      <div className="relative z-10 w-full flex-1 flex flex-col justify-end items-center px-3 sm:px-6 md:px-8 pb-3 pt-0">
+        <div className="relative w-full max-w-4xl lg:max-w-5xl flex flex-col items-center">
+          {/* 1. CRT Monitor: Front and Center on the desk */}
+          <div className="relative z-10 w-full flex justify-center">
+            <CrtMonitor
               activeGame={activeGame}
-              isSlotOpen={isSlotModalOpen}
+              onEjectGame={handleEjectGame}
               onOpenCartridgeSlot={handleOpenSlot}
+              onEarnPoints={handleEarnPoints}
             />
           </div>
 
-          {/* Beside NES (Not blocking CRT): Illustrated Cartridges on the cutting mat */}
-          <div className="flex items-end shrink-0 pb-1">
-            <CartridgePile
-              games={games}
-              activeGame={activeGame}
-              unlockedGameIds={unlockedGameIds}
-              playerPoints={playerPoints}
-              onSelectGame={handleSelectGame}
-              onUnlockGame={handleUnlockGame}
-              onOpenCartridgeSlot={handleOpenSlot}
-            />
+          {/* 2. Desk Foreground Row: NES on Left (overlapping CRT bottom-left), Cartridges on Right */}
+          <div className="w-full flex flex-row items-end justify-between relative z-20 -mt-8 sm:-mt-12 md:-mt-14 pointer-events-none px-1 sm:px-3">
+            {/* Bottom-Left: NES Console overlapping bottom-left corner of the CRT */}
+            <div className="pointer-events-auto flex items-end">
+              <NesConsole
+                activeGame={activeGame}
+                isSlotOpen={isSlotModalOpen}
+                onOpenCartridgeSlot={handleOpenSlot}
+              />
+            </div>
+
+            {/* Bottom-Right: Stack of Cartridges in bottom-right corner of the desk */}
+            <div className="pointer-events-auto flex items-end pb-1 sm:pb-2">
+              <CartridgePile
+                games={games}
+                activeGame={activeGame}
+                unlockedGameIds={unlockedGameIds}
+                playerPoints={playerPoints}
+                onSelectGame={handleSelectGame}
+                onUnlockGame={handleUnlockGame}
+                onOpenCartridgeSlot={handleOpenSlot}
+              />
+            </div>
           </div>
         </div>
       </div>

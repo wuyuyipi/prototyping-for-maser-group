@@ -6,7 +6,7 @@ export interface ShopItem {
   price: number; // points needed to buy
   author: string;
   labelColor: string;
-  pixelArtIcon: string;
+  pixelArtIcon?: string;
   labelBadge: string;
   isUnlocked?: boolean;
 
@@ -16,7 +16,7 @@ export interface ShopItem {
   clerkName: string;
   clerkGreeting: string;
   accentColor: string;
-  storeSignIcon: string;
+  storeSignIcon?: string;
   landmarkTileIndex: number;
 }
 

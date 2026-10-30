@@ -23,31 +23,26 @@ interface ShopModalProps {
 export default function ShopModal({
   isOpen,
   playerPoints,
-  unlockedGameIds,
+  unlockedGameIds = [],
   onClose,
   onPurchaseGame,
 }: ShopModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  // Shop items state (tracks which are unlocked)
-  const [shopItems, setShopItems] = useState<ShopItem[]>(() =>
-    INITIAL_SHOP_ITEMS.map((item) => ({
-      ...item,
-      isUnlocked: item.isUnlocked || (unlockedGameIds?.includes(item.id) ?? false),
-    }))
-  );
+  // Locally purchased item IDs in addition to unlockedGameIds
+  const [purchasedItemIds, setPurchasedItemIds] = useState<string[]>([]);
 
-  // Keep unlocked state in sync if unlockedGameIds prop changes
-  useEffect(() => {
-    if (unlockedGameIds) {
-      setShopItems((prev) =>
-        prev.map((item) => ({
-          ...item,
-          isUnlocked: item.isUnlocked || unlockedGameIds.includes(item.id),
-        }))
-      );
-    }
-  }, [unlockedGameIds]);
+  // Shop items with dynamic isUnlocked status
+  const shopItems: ShopItem[] = React.useMemo(() => {
+    return INITIAL_SHOP_ITEMS.map((item) => ({
+      ...item,
+      isUnlocked: Boolean(
+        item.isUnlocked ||
+        unlockedGameIds.includes(item.id) ||
+        purchasedItemIds.includes(item.id)
+      ),
+    }));
+  }, [unlockedGameIds, purchasedItemIds]);
 
   // Avatar Selection state (defaults to Spike the Dino Kaiju)
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>("dino");
@@ -84,13 +79,16 @@ export default function ShopModal({
   // Current tile data
   const currentTile: BoardTile = BOARD_TILES[currentTileIndex] || BOARD_TILES[0];
 
-  // Map stores to their landmark tiles (Integrated with actual arcade games)
-  const landmarkStoreMap: Record<number, ShopItem> = {
-    5: shopItems.find((i) => i.id === "super-pixel-bros")!,
-    11: shopItems.find((i) => i.id === "tetris")!,
-    21: shopItems.find((i) => i.id === "fruit-ninja")!,
-    26: shopItems.find((i) => i.id === "pixel-pinball-88")!,
-  };
+  // Map stores to their landmark tiles dynamically
+  const landmarkStoreMap = React.useMemo(() => {
+    const map: Record<number, ShopItem> = {};
+    for (const item of shopItems) {
+      if (item.landmarkTileIndex !== undefined) {
+        map[item.landmarkTileIndex] = item;
+      }
+    }
+    return map;
+  }, [shopItems]);
 
   // Close handler
   const handleClose = () => {
@@ -191,8 +189,8 @@ export default function ShopModal({
   // Buy game from store
   const handleBuyGame = (item: ShopItem) => {
     playSound("coin");
-    setShopItems((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, isUnlocked: true } : i))
+    setPurchasedItemIds((prev) =>
+      prev.includes(item.id) ? prev : [...prev, item.id]
     );
     onPurchaseGame?.(item);
   };

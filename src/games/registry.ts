@@ -2,44 +2,26 @@ import { GameDefinition } from "./types";
 import SuperPixelBrosGame from "./super-pixel-bros/SuperPixelBrosGame";
 import TetrisGame from "./tetris/TetrisGame";
 import FruitNinjaGame from "./fruit-ninja/FruitNinjaGame";
+import MarioInvadersGame from "./mario-invaders/MarioInvadersGame";
 
 /**
  * =======================================================================
  * RETRO ARCADE GAME REGISTRY
- * 1. Pixel Fruit Ninja (Unlocked by default - play to earn points!)
- * 2. Super Pixel Bros. (Requires 300 PTS to unlock)
- * 3. Tetris (Requires 500 PTS to unlock)
+ * 1. Super Pixel Bros. (Unlocked by default)
+ * 2. Tetris (Unlocked by default)
+ * 3. Pixel Fruit Ninja (Available in Game Shop for 300 PTS)
+ * 4. Mario Invaders (Available in Game Shop for 300 PTS)
  * =======================================================================
  */
 export const GAMES_REGISTRY: GameDefinition[] = [
   {
-    id: "fruit-ninja",
-    title: "Pixel Fruit Ninja",
-    author: "Mingtai",
-    year: 1987,
-    genre: "Dojo Slasher",
-    description:
-      "Slash flying pixel watermelons & golden peaches with your katana, rack up combos, and dodge bombs!",
-    instructions:
-      "Swipe mouse across the CRT screen (or press Space) to slash fruits. Avoid bombs! R to restart.",
-    cartridgeColor: "#14532d",
-    labelColor: "#15803d",
-    accentColor: "#ef4444",
-    labelBadge: "NES-FN-USA",
-    pixelArtIcon: "🍉",
-    status: "ready",
-    price: 0,
-    initiallyUnlocked: true,
-    Component: FruitNinjaGame,
-  },
-  {
     id: "super-pixel-bros",
     title: "Super Pixel Bros.",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1985,
     genre: "Platformer",
     description:
-      "Control Justin! Headbutt question blocks, stomp Goomba mushrooms, climb the stairs, and reach the flagpole!",
+      "Headbutt question blocks, stomp Goomba mushrooms, climb the stairs, and reach the flagpole!",
     instructions:
       "Left/Right or A/D to run, Space or Up to jump, R to restart.",
     cartridgeColor: "#991b1b",
@@ -48,14 +30,14 @@ export const GAMES_REGISTRY: GameDefinition[] = [
     labelBadge: "NES-SM-USA",
     pixelArtIcon: "🍄",
     status: "ready",
-    price: 300,
-    initiallyUnlocked: false,
+    price: 0,
+    initiallyUnlocked: true,
     Component: SuperPixelBrosGame,
   },
   {
     id: "tetris",
     title: "Tetris",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1989,
     genre: "Block Puzzle",
     description:
@@ -68,9 +50,49 @@ export const GAMES_REGISTRY: GameDefinition[] = [
     labelBadge: "NES-EI-USA",
     pixelArtIcon: "🧱",
     status: "ready",
-    price: 500,
-    initiallyUnlocked: false,
+    price: 0,
+    initiallyUnlocked: true,
     Component: TetrisGame,
+  },
+  {
+    id: "fruit-ninja",
+    title: "Pixel Fruit Ninja",
+    author: "Retro Arcade",
+    year: 1987,
+    genre: "Dojo Slasher",
+    description:
+      "Slash flying pixel watermelons & golden peaches with your katana, rack up combos, and dodge bombs!",
+    instructions:
+      "Swipe mouse across the CRT screen (or press Space) to slash fruits. Avoid bombs! R to restart.",
+    cartridgeColor: "#14532d",
+    labelColor: "#15803d",
+    accentColor: "#ef4444",
+    labelBadge: "NES-FN-USA",
+    pixelArtIcon: "🍉",
+    status: "ready",
+    price: 300,
+    initiallyUnlocked: false,
+    Component: FruitNinjaGame,
+  },
+  {
+    id: "mario-invaders",
+    title: "Mario Invaders",
+    author: "Zhongyue",
+    year: 1986,
+    genre: "Space Shooter",
+    description:
+      "Pilot Mario's red fighter plane, blast waves of Goombas, Koopas, and Piranha Plants in 16-bit retro sky patrol!",
+    instructions:
+      "Left/Right or A/D to fly, Space to shoot fireballs (max 3), P to pause, R to restart.",
+    cartridgeColor: "#7f1d1d",
+    labelColor: "#b91c1c",
+    accentColor: "#facc15",
+    labelBadge: "NES-MI-USA",
+    pixelArtIcon: "✈️",
+    status: "ready",
+    price: 300,
+    initiallyUnlocked: false,
+    Component: MarioInvadersGame,
   },
 ];
 

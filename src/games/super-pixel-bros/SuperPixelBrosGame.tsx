@@ -782,7 +782,7 @@ export default function SuperPixelBrosGame({
               onClick={restartGame}
               className="w-full py-2 px-3 bg-emerald-600 hover:bg-emerald-500 active:translate-y-0.5 text-white font-bold text-[9px] sm:text-[10px] rounded border-2 border-emerald-300 cursor-pointer shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all"
             >
-              🔄 重新开始 / PLAY AGAIN
+              🔄 PLAY AGAIN
             </button>
           </div>
         </div>

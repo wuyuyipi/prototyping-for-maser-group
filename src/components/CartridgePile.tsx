@@ -24,7 +24,7 @@ export default function CartridgePile({
   onUnlockGame,
   onOpenCartridgeSlot,
 }: CartridgePileProps) {
-  const [lockNotice, setLockNotice] = useState<string | null>(null);
+  const [confirmGame, setConfirmGame] = useState<GameDefinition | null>(null);
 
   const handleCartridgeClick = (game: GameDefinition) => {
     const isUnlocked = unlockedGameIds.includes(game.id);
@@ -34,21 +34,24 @@ export default function CartridgePile({
       return;
     }
 
-    const price = game.price || 0;
-    if (playerPoints >= price) {
-      const success = onUnlockGame(game);
-      if (success) {
-        playSound("coin");
-        setLockNotice(`🎉 UNLOCKED ${game.title.toUpperCase()}!`);
-        setTimeout(() => setLockNotice(null), 2200);
-        onSelectGame(game);
-      }
-    } else {
+    // Open purchase confirmation dialog for locked cartridge
+    playSound("blip");
+    setConfirmGame(game);
+  };
+
+  const handleConfirmPurchase = () => {
+    if (!confirmGame) return;
+    const price = confirmGame.price || 0;
+    if (playerPoints < price) {
       playSound("blockHit");
-      setLockNotice(
-        `🔒 NEED ${price} PTS TO UNLOCK ${game.title.toUpperCase()}! (HAVE ${playerPoints} PTS)`
-      );
-      setTimeout(() => setLockNotice(null), 2500);
+      return;
+    }
+    const success = onUnlockGame(confirmGame);
+    if (success) {
+      playSound("coin");
+      const unlocked = confirmGame;
+      setConfirmGame(null);
+      onSelectGame(unlocked);
     }
   };
 
@@ -57,16 +60,11 @@ export default function CartridgePile({
       {/* Soft table contact shadow beneath the cartridges on the purple cutting mat */}
       <div className="absolute -bottom-2 inset-x-2 h-4 bg-black/60 rounded-full filter blur-xs pointer-events-none" />
 
-      {/* Floating Notice when clicking a locked cartridge */}
-      {lockNotice && (
-        <div className="absolute -top-9 left-0 bg-neutral-950/95 border-2 border-amber-400 text-amber-300 px-2.5 py-1 rounded text-[7px] sm:text-[8px] font-bold whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.6)] z-50 animate-bounce">
-          {lockNotice}
-        </div>
-      )}
-
       {/* Title Tag */}
       <div className="flex items-center justify-between mb-1.5 text-[7px] text-amber-200/90 px-1 font-bold relative z-10">
-        <span>CARTRIDGES ({unlockedGameIds.length}/{games.length} UNLOCKED)</span>
+        <span>
+          CARTRIDGES ({unlockedGameIds.length}/{games.length} UNLOCKED)
+        </span>
         <button
           type="button"
           onClick={onOpenCartridgeSlot}
@@ -82,8 +80,10 @@ export default function CartridgePile({
           const isCurrent = activeGame?.id === game.id;
           const isUnlocked = unlockedGameIds.includes(game.id);
           const price = game.price || 0;
-          const canAfford = playerPoints >= price;
-          const shellColor = game.cartridgeColor || "#374151";
+          // Locked cartridges are grey!
+          const shellColor = isUnlocked
+            ? game.cartridgeColor || "#374151"
+            : "#52525b";
 
           return (
             <button
@@ -93,7 +93,7 @@ export default function CartridgePile({
               title={
                 isUnlocked
                   ? `Load ${game.title} into NES`
-                  : `Unlock ${game.title} for ${price} PTS`
+                  : `Purchase required: ${game.title} (${price} PTS)`
               }
               style={{
                 backgroundColor: shellColor,
@@ -115,27 +115,27 @@ export default function CartridgePile({
                 </div>
                 <span
                   className="text-[5px] font-bold px-1 rounded-xs text-black"
-                  style={{ backgroundColor: game.accentColor }}
+                  style={{
+                    backgroundColor: isUnlocked ? game.accentColor : "#a1a1aa",
+                  }}
                 >
                   {game.pixelArtIcon}
                 </span>
               </div>
 
-              {/* Custom Pixel-Art Game Illustration Cover */}
+              {/* Custom Pixel-Art Game Illustration Cover (Greyscale if locked) */}
               <div className="relative w-full">
-                <CartridgeArt gameId={game.id} compact />
+                <div className={!isUnlocked ? "grayscale opacity-65" : ""}>
+                  <CartridgeArt gameId={game.id} compact />
+                </div>
 
-                {/* Lock / Unlock Badge Overlay on Art if Locked */}
+                {/* Grey Locked Overlay with "PURCHASE REQUIRED" Badge */}
                 {!isUnlocked && (
-                  <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-1 text-center">
-                    <span
-                      className={`text-[6px] sm:text-[7px] font-bold px-1.5 py-0.5 rounded border ${
-                        canAfford
-                          ? "bg-emerald-600 text-white border-emerald-300 animate-pulse"
-                          : "bg-neutral-950/95 text-amber-300 border-amber-500"
-                      }`}
-                    >
-                      {canAfford ? `🔓 BUY ${price}P` : `🔒 ${price} PTS`}
+                  <div className="absolute inset-0 bg-neutral-900/65 flex flex-col items-center justify-center p-1 text-center">
+                    <span className="text-[5px] sm:text-[6px] font-bold px-1.5 py-0.5 rounded bg-neutral-950/95 text-neutral-200 border border-neutral-400 leading-tight">
+                      🔒 PURCHASE
+                      <br />
+                      <span className="text-amber-300">🪙 {price} PTS</span>
                     </span>
                   </div>
                 )}
@@ -151,7 +151,9 @@ export default function CartridgePile({
               {/* Game Title Banner at Bottom of Cartridge */}
               <div
                 className="w-full mt-1 px-1.5 py-1 border border-black flex items-center justify-between"
-                style={{ backgroundColor: game.labelColor }}
+                style={{
+                  backgroundColor: isUnlocked ? game.labelColor : "#3f3f46",
+                }}
               >
                 <span className="text-[6px] sm:text-[7px] font-bold text-white truncate drop-shadow-[0_1px_1px_rgba(0,0,0,0.9)]">
                   {game.title}
@@ -161,6 +163,73 @@ export default function CartridgePile({
           );
         })}
       </div>
+
+      {/* Purchase Confirmation Dialog Box */}
+      {confirmGame && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-neutral-900 border-4 border-amber-400 p-4 sm:p-5 rounded-md max-w-xs w-full text-center shadow-[0_0_30px_rgba(251,191,36,0.45)] space-y-3">
+            <div className="text-amber-300 text-[10px] sm:text-xs font-bold tracking-wider border-b border-neutral-700 pb-2">
+              🔒 PURCHASE CARTRIDGE?
+            </div>
+
+            <div className="text-white text-[10px] sm:text-xs font-bold">
+              {confirmGame.pixelArtIcon} {confirmGame.title}
+            </div>
+
+            <div className="bg-neutral-950 border-2 border-neutral-700 p-2.5 rounded text-[8px] sm:text-[9px] space-y-1.5 text-left">
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-400">COST TO UNLOCK:</span>
+                <span className="text-amber-300 font-bold">
+                  🪙 {confirmGame.price || 0} PTS
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-neutral-400">CURRENT POINTS:</span>
+                <span className="text-emerald-300 font-bold">
+                  🪙 {playerPoints} PTS
+                </span>
+              </div>
+              <div className="border-t border-neutral-800 pt-1.5 flex justify-between items-center">
+                <span className="text-neutral-400">STATUS:</span>
+                {playerPoints >= (confirmGame.price || 0) ? (
+                  <span className="text-emerald-400 font-bold">
+                    READY TO BUY
+                  </span>
+                ) : (
+                  <span className="text-red-400 font-bold">
+                    NEED {(confirmGame.price || 0) - playerPoints} MORE PTS
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                type="button"
+                onClick={handleConfirmPurchase}
+                disabled={playerPoints < (confirmGame.price || 0)}
+                className={`flex-1 py-2 px-2 rounded text-[8px] sm:text-[9px] font-bold border-2 transition-all ${
+                  playerPoints >= (confirmGame.price || 0)
+                    ? "bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-300 cursor-pointer active:translate-y-0.5"
+                    : "bg-neutral-800 text-neutral-500 border-neutral-700 cursor-not-allowed"
+                }`}
+              >
+                ✓ CONFIRM BUY
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playSound("blip");
+                  setConfirmGame(null);
+                }}
+                className="flex-1 py-2 px-2 bg-neutral-800 hover:bg-neutral-700 text-red-300 border-2 border-neutral-600 rounded text-[8px] sm:text-[9px] font-bold cursor-pointer active:translate-y-0.5"
+              >
+                ✕ CANCEL
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

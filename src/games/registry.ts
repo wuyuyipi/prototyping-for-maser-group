@@ -34,7 +34,7 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   },
   {
     id: "super-pixel-bros",
-    title: "Super Pixel Bros.",
+    title: "Justin's Adventure",
     author: "Arcade Team",
     year: 1985,
     genre: "Platformer",

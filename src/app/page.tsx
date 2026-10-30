@@ -15,11 +15,21 @@ import { playSound } from "@/components/AudioEffects";
 
 export default function RetroLivingRoomPage() {
   const [games] = useState<GameDefinition[]>(GAMES_REGISTRY);
+  // Initially only the first game (Fruit Ninja) is unlocked; later 2 games require points!
+  const [unlockedGameIds, setUnlockedGameIds] = useState<string[]>(() =>
+    GAMES_REGISTRY.filter((g) => g.initiallyUnlocked !== false).map((g) => g.id)
+  );
   // Default to first game or null
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  const [playerPoints, setPlayerPoints] = useState<number>(1250);
+  // Initial points set to 0!
+  const [playerPoints, setPlayerPoints] = useState<number>(0);
+  const [recentPointsGain, setRecentPointsGain] = useState<{
+    amount: number;
+    id: number;
+  } | null>(null);
+  const [pointsHighlight, setPointsHighlight] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
 
   const handleOpenSlot = () => {
@@ -31,7 +41,17 @@ export default function RetroLivingRoomPage() {
   };
 
   const handleSelectGame = (game: GameDefinition) => {
+    if (!unlockedGameIds.includes(game.id)) return;
     setActiveGame(game);
+  };
+
+  const handleUnlockGame = (game: GameDefinition): boolean => {
+    if (unlockedGameIds.includes(game.id)) return true;
+    const price = game.price || 0;
+    if (playerPoints < price) return false;
+    setPlayerPoints((prev) => Math.max(0, prev - price));
+    setUnlockedGameIds((prev) => [...prev, game.id]);
+    return true;
   };
 
   const handleEjectGame = () => {
@@ -44,7 +64,13 @@ export default function RetroLivingRoomPage() {
   };
 
   const handleEarnPoints = (pts: number) => {
+    if (pts <= 0) return;
     setPlayerPoints((prev) => prev + pts);
+    setRecentPointsGain({ amount: pts, id: Date.now() + Math.random() });
+    setPointsHighlight(true);
+    setTimeout(() => {
+      setPointsHighlight(false);
+    }, 650);
   };
 
   return (
@@ -83,7 +109,7 @@ export default function RetroLivingRoomPage() {
         </div>
 
         {/* Action Controls: Shop Button & Team Guide */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="relative flex items-center gap-2 sm:gap-3">
           {/* Shop Feature Button */}
           <button
             type="button"
@@ -93,14 +119,34 @@ export default function RetroLivingRoomPage() {
             }}
             aria-label="Open Game Shop"
             title="Open shop shelf to buy new games with points"
-            className="bg-neutral-900/90 hover:bg-neutral-800 text-yellow-300 px-3 py-1.5 rounded border-2 border-yellow-500/80 hover:border-yellow-400 pixel-border-sm cursor-pointer transition-all flex items-center gap-2 shadow-[0_0_14px_rgba(234,179,8,0.35)] active:translate-y-0.5"
+            className={`bg-neutral-900/90 hover:bg-neutral-800 text-yellow-300 px-3 py-1.5 rounded border-2 pixel-border-sm cursor-pointer transition-all duration-200 flex items-center gap-2 active:translate-y-0.5 ${
+              pointsHighlight
+                ? "border-emerald-400 scale-110 shadow-[0_0_24px_rgba(52,211,153,0.9)]"
+                : "border-yellow-500/80 hover:border-yellow-400 shadow-[0_0_14px_rgba(234,179,8,0.35)]"
+            }`}
           >
             <span className="text-xs">🏪</span>
             <span className="font-bold tracking-wider">GAME SHOP</span>
-            <span className="bg-neutral-950 px-1.5 py-0.5 rounded text-[8px] text-amber-400 border border-yellow-600/50">
+            <span
+              className={`px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold border transition-all duration-200 ${
+                pointsHighlight
+                  ? "bg-emerald-950 text-emerald-300 border-emerald-400 scale-110"
+                  : "bg-neutral-950 text-amber-300 border-yellow-600/50"
+              }`}
+            >
               🪙 {playerPoints.toLocaleString()} PTS
             </span>
           </button>
+
+          {/* Floating +PTS Notification in Top Right */}
+          {recentPointsGain && (
+            <div
+              key={recentPointsGain.id}
+              className="pointer-events-none absolute -bottom-7 left-1/2 -translate-x-1/2 bg-emerald-950/95 text-emerald-300 border-2 border-emerald-400 px-2.5 py-0.5 rounded text-[9px] sm:text-[10px] font-bold shadow-[0_0_14px_rgba(16,185,129,0.85)] animate-bounce whitespace-nowrap z-50"
+            >
+              +{recentPointsGain.amount} PTS! 🪙
+            </div>
+          )}
 
           {/* Team Collaboration Guide */}
           <button
@@ -185,7 +231,10 @@ export default function RetroLivingRoomPage() {
             <CartridgePile
               games={games}
               activeGame={activeGame}
+              unlockedGameIds={unlockedGameIds}
+              playerPoints={playerPoints}
               onSelectGame={handleSelectGame}
+              onUnlockGame={handleUnlockGame}
               onOpenCartridgeSlot={handleOpenSlot}
             />
           </div>
@@ -197,14 +246,21 @@ export default function RetroLivingRoomPage() {
         isOpen={isSlotModalOpen}
         games={games}
         activeGame={activeGame}
+        unlockedGameIds={unlockedGameIds}
+        playerPoints={playerPoints}
         onClose={handleCloseSlot}
         onSelectGame={handleSelectGame}
+        onUnlockGame={handleUnlockGame}
       />
 
       {/* Shop Feature Modal (Triggered by clicking the Game Shop button) */}
       <ShopModal
         isOpen={isShopModalOpen}
         playerPoints={playerPoints}
+        games={games}
+        unlockedGameIds={unlockedGameIds}
+        onUnlockGame={handleUnlockGame}
+        onSelectGame={handleSelectGame}
         onClose={() => setIsShopModalOpen(false)}
         onPurchaseGame={handlePurchaseGame}
       />

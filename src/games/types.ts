@@ -16,6 +16,8 @@ export interface GameMetadata {
   labelBadge: string; // Game code, e.g. "NES-SM-USA"
   pixelArtIcon: string; // Emoji or pixel icon representation for label
   status: GameStatus;
+  price?: number; // Points required to unlock (0 or undefined = free)
+  initiallyUnlocked?: boolean; // Whether unlocked at start
 }
 
 export interface GameComponentProps {

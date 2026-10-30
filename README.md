@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🕹️ 8-Bit Retro Arcade (NES Setup)
 
-## Getting Started
+A collaborative retro gaming arcade built with **Next.js**, **React**, and **Tailwind CSS**. Designed like an authentic 1980s living room gaming setup featuring a CRT television monitor, a Nintendo Entertainment System (NES) console, and a stack of collectible game cartridges.
 
-First, run the development server:
+---
+
+## ⚡ Quick Start
 
 ```bash
+# Install dependencies
+npm install
+
+# Start the local development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📺 Visual Layout
 
-## Learn More
+- **Top/Center Screen**: Vintage CRT Monitor with curved glass, scanline simulation, power LED, TV hardware controls, and 4:3 gaming display.
+- **Bottom-Left**: 8-bit NES Console with interactive cartridge chamber flap, Power/Reset switches, and dual controller ports.
+- **Bottom-Right (Desk Shelf)**: Pile of owned NES cartridges showing spine labels. Clicking any cartridge immediately loads it into the NES and boots it on the CRT screen.
+- **Cartridge Selector**: Clicking the NES cartridge door opens the front-facing cartridge showcase modal.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 👥 Teammate Collaboration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for full instructions on creating feature branches and plugging your game into the shared arcade foundation.

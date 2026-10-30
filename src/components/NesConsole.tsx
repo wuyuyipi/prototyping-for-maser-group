@@ -17,15 +17,14 @@ export default function NesConsole({
   onOpenCartridgeSlot,
   onResetGame,
 }: NesConsoleProps) {
-  // Local door state allows flipping the door open/closed
   const [doorOpen, setDoorOpen] = useState(false);
   const isOpen = doorOpen || isModalOpen;
 
   const handleDoorClick = () => {
     playSound("slotOpen");
-    const nextState = !isOpen;
-    setDoorOpen(nextState);
-    if (nextState) {
+    const next = !isOpen;
+    setDoorOpen(next);
+    if (next) {
       onOpenCartridgeSlot();
     }
   };
@@ -39,165 +38,179 @@ export default function NesConsole({
   return (
     <div className="relative select-none font-pixel pointer-events-auto flex flex-col items-center">
       {/* ======================================================================
-          SVG Pixel-Art NES-001 (Perspective Front-Loader matching real console)
+          Authentic Proportional NES Front-Loader
+          Proportions: Wide, low-profile, boxy 80s console form factor.
+          Color Palette: Muted warm room lighting (ambient dusk / warm incandescent room glow)
           ====================================================================== */}
       <svg
-        viewBox="0 0 320 180"
-        className="w-72 sm:w-80 md:w-88 h-auto filter drop-shadow-[0_20px_25px_rgba(0,0,0,0.9)] cursor-pointer"
+        viewBox="0 0 380 150"
+        className="w-80 sm:w-96 md:w-[410px] h-auto filter drop-shadow-[0_15px_22px_rgba(0,0,0,0.95)] cursor-pointer"
         onClick={handleDoorClick}
         role="button"
         aria-label="NES Console - Click cartridge slot to open and switch games"
       >
         <defs>
-          {/* LED Glow Filter */}
-          <filter id="red-led-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
+          {/* Soft ambient table contact shadow */}
+          <radialGradient id="tableShadowGrad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#000000" stopOpacity="0.85" />
+            <stop offset="70%" stopColor="#000000" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#000000" stopOpacity="0" />
+          </radialGradient>
 
-          {/* Gradients for authentic plastic shading */}
-          <linearGradient id="topChassisGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e4e8eb" />
-            <stop offset="100%" stopColor="#cbcfd4" />
+          {/* Warm room lighting gradients */}
+          {/* Top cover: Warm muted grey with slight amber ambient reflection */}
+          <linearGradient id="nesTopLid" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#a39e97" />
+            <stop offset="100%" stopColor="#87837c" />
           </linearGradient>
 
-          <linearGradient id="baseChassisGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#676b74" />
-            <stop offset="100%" stopColor="#464950" />
+          {/* Front upper face: Soft warm light grey */}
+          <linearGradient id="nesUpperFace" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#96928b" />
+            <stop offset="100%" stopColor="#7a766f" />
           </linearGradient>
 
-          <linearGradient id="blackBandGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#18191c" />
-            <stop offset="100%" stopColor="#0c0d0f" />
+          {/* Lower chassis: Deep warm charcoal / shadow */}
+          <linearGradient id="nesLowerBase" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3d3a38" />
+            <stop offset="100%" stopColor="#252322" />
           </linearGradient>
+
+          {/* Recessed black grill band: Dark moody black */}
+          <linearGradient id="nesBlackBand" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#1a1819" />
+            <stop offset="100%" stopColor="#0d0c0d" />
+          </linearGradient>
+
+          {/* Ambient red LED glow */}
+          <radialGradient id="nesLedGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#ff3333" stopOpacity="1" />
+            <stop offset="60%" stopColor="#cc1111" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#990000" stopOpacity="0" />
+          </radialGradient>
         </defs>
 
         {/* -------------------------------------------------------------
-            1. CONSOLE BASE (Dark Charcoal Lower Section)
+            0. DESK CONTACT SHADOW
             ------------------------------------------------------------- */}
-        {/* Slanted Lower Base */}
-        <polygon
-          points="20,95 300,95 292,170 28,170"
-          fill="url(#baseChassisGrad)"
-          stroke="#2d3035"
-          strokeWidth="2"
-        />
-        {/* Base Bevel Bottom Trim */}
-        <polygon
-          points="28,170 292,170 288,176 32,176"
-          fill="#31343a"
-        />
+        <ellipse cx="190" cy="144" rx="180" ry="6" fill="url(#tableShadowGrad)" />
 
         {/* -------------------------------------------------------------
-            2. UPPER CHASSIS (Light Grey Top Section)
+            1. LOWER CHASSIS BASE (Dark Charcoal, beveled sides)
             ------------------------------------------------------------- */}
-        {/* Top Cover Surface (Angled perspective top) */}
         <polygon
-          points="45,15 275,15 300,50 20,50"
-          fill="#dce0e4"
-          stroke="#b0b5bb"
+          points="15,86 365,86 354,142 26,142"
+          fill="url(#nesLowerBase)"
+          stroke="#1e1c1b"
           strokeWidth="1.5"
         />
+        {/* Bottom rubber foot strip / lip */}
+        <polygon points="26,142 354,142 350,146 30,146" fill="#141312" />
 
-        {/* Top Right Ventilation Slats Grill */}
-        <polygon points="195,18 270,18 290,48 205,48" fill="#c7ccd2" />
-        {[...Array(14)].map((_, i) => (
+        {/* -------------------------------------------------------------
+            2. UPPER TOP LID (Wide, low-profile perspective)
+            ------------------------------------------------------------- */}
+        <polygon
+          points="42,16 338,16 365,52 15,52"
+          fill="url(#nesTopLid)"
+          stroke="#686560"
+          strokeWidth="1.2"
+        />
+        {/* Soft edge highlight on top-front rim */}
+        <line x1="16" y1="52" x2="364" y2="52" stroke="#b5b0a8" strokeWidth="1" />
+
+        {/* Top-Right Ventilation Heat Grill */}
+        <polygon points="230,18 332,18 356,50 244,50" fill="#75716b" />
+        {[...Array(18)].map((_, i) => (
           <line
             key={i}
-            x1={197 + i * 5}
-            y1={20}
-            x2={207 + i * 5.8}
-            y2={46}
-            stroke="#9ba1aa"
-            strokeWidth="2"
+            x1={233 + i * 5.6}
+            y1={19}
+            x2={247 + i * 6.2}
+            y2={49}
+            stroke="#54514c"
+            strokeWidth="1.8"
           />
         ))}
 
-        {/* Front Upper Face (Light Grey) */}
+        {/* Front Upper Face (Wide & Slim) */}
         <rect
-          x="20"
-          y="50"
-          width="280"
-          height="48"
-          fill="url(#topChassisGrad)"
-          stroke="#9ba0a7"
-          strokeWidth="1.5"
+          x="15"
+          y="52"
+          width="350"
+          height="34"
+          fill="url(#nesUpperFace)"
+          stroke="#5b5752"
+          strokeWidth="1.2"
         />
 
         {/* -------------------------------------------------------------
             3. RIGHT BLACK RECESS BAND & CONTROLLER PORTS
             ------------------------------------------------------------- */}
-        {/* Top Recessed Black Groove */}
-        <polygon points="190,15 204,15 214,50 200,50" fill="#141518" />
-        {/* Front Vertical Black Band */}
+        {/* Top Black Notch */}
+        <polygon points="220,16 234,16 248,52 232,52" fill="#141314" />
+        {/* Front Vertical Black Band (Iconic NES stripe) */}
         <rect
-          x="198"
-          y="50"
-          width="40"
-          height="120"
-          fill="url(#blackBandGrad)"
-          stroke="#090a0c"
-          strokeWidth="1.5"
+          x="232"
+          y="52"
+          width="50"
+          height="90"
+          fill="url(#nesBlackBand)"
+          stroke="#0a0a0b"
+          strokeWidth="1"
         />
 
-        {/* Controller Port 1 (Top) */}
-        <g transform="translate(206, 102)">
-          <rect x="0" y="0" width="24" height="15" rx="1" fill="#000" stroke="#25272c" strokeWidth="1" />
-          <text x="3" y="-3" fill="#d82424" fontSize="6" fontFamily="monospace" fontWeight="bold">1</text>
-          {/* 7 Pins */}
-          {[2, 7, 12, 17, 22].map((px, i) => (
-            <circle key={i} cx={px} cy={5} r="1" fill="#757982" />
+        {/* Controller Port 1 */}
+        <g transform="translate(242, 94)">
+          <rect x="0" y="0" width="30" height="17" rx="1" fill="#080809" stroke="#1f1e20" strokeWidth="1" />
+          <text x="3" y="-3" fill="#a82020" fontSize="6" fontFamily="monospace" fontWeight="bold">1</text>
+          {/* Pins */}
+          {[3, 9, 15, 21, 27].map((px, i) => (
+            <circle key={i} cx={px} cy={6} r="1" fill="#4d4c50" />
           ))}
-          <circle cx={5} cy={10} r="1" fill="#757982" />
-          <circle cx={19} cy={10} r="1" fill="#757982" />
+          <circle cx="7" cy="12" r="1" fill="#4d4c50" />
+          <circle cx="23" cy="12" r="1" fill="#4d4c50" />
         </g>
 
-        {/* Controller Port 2 (Bottom) */}
-        <g transform="translate(206, 128)">
-          <rect x="0" y="0" width="24" height="15" rx="1" fill="#000" stroke="#25272c" strokeWidth="1" />
-          <text x="3" y="-3" fill="#d82424" fontSize="6" fontFamily="monospace" fontWeight="bold">2</text>
-          {[2, 7, 12, 17, 22].map((px, i) => (
-            <circle key={i} cx={px} cy={5} r="1" fill="#757982" />
+        {/* Controller Port 2 */}
+        <g transform="translate(242, 118)">
+          <rect x="0" y="0" width="30" height="17" rx="1" fill="#080809" stroke="#1f1e20" strokeWidth="1" />
+          <text x="3" y="-3" fill="#a82020" fontSize="6" fontFamily="monospace" fontWeight="bold">2</text>
+          {[3, 9, 15, 21, 27].map((px, i) => (
+            <circle key={i} cx={px} cy={6} r="1" fill="#4d4c50" />
           ))}
-          <circle cx={5} cy={10} r="1" fill="#757982" />
-          <circle cx={19} cy={10} r="1" fill="#757982" />
+          <circle cx="7" cy="12" r="1" fill="#4d4c50" />
+          <circle cx="23" cy="12" r="1" fill="#4d4c50" />
         </g>
 
         {/* -------------------------------------------------------------
             4. LOWER LEFT: POWER / RESET BUTTONS & RED LED
             ------------------------------------------------------------- */}
-        {/* Red Power LED */}
-        <circle
-          cx="48"
-          cy="126"
-          r="3"
-          fill={activeGame ? "#ff2a2a" : "#600"}
-          filter={activeGame ? "url(#red-led-glow)" : "none"}
-        />
-        <circle cx="48" cy="126" r="1.5" fill={activeGame ? "#ff9999" : "#400"} />
-
-        {/* POWER Button */}
-        <g transform="translate(62, 114)">
+        {/* Power LED Indicator */}
+        <g transform="translate(48, 114)">
+          <rect x="-1" y="-1" width="8" height="8" rx="1" fill="#141312" />
           <rect
             x="0"
             y="0"
-            width="38"
-            height="22"
-            rx="1"
-            fill="#dce0e4"
-            stroke="#1c1e22"
-            strokeWidth="1.5"
-            className="hover:fill-white"
+            width="6"
+            height="6"
+            fill={activeGame ? "url(#nesLedGlow)" : "#3a0a0a"}
           />
-          {/* 3D Inset Bevel */}
-          <rect x="2" y="2" width="34" height="18" fill="#cbcfd4" />
+          {activeGame && (
+            <rect x="1.5" y="1.5" width="3" height="3" fill="#ff7777" opacity="0.9" />
+          )}
+        </g>
+
+        {/* POWER Button */}
+        <g transform="translate(68, 102)">
+          {/* Button Bezel Base */}
+          <rect x="0" y="0" width="46" height="24" rx="1" fill="#1c1b1a" />
+          {/* Button Surface (Warm, aged plastic) */}
+          <rect x="2" y="2" width="42" height="20" rx="1" fill="#78746e" className="hover:fill-[#8c8881]" />
           <text
-            x="7"
-            y="13"
-            fill="#d82424"
+            x="9"
+            y="14"
+            fill="#a82020"
             fontSize="6"
             fontFamily="'Press Start 2P', monospace"
             fontWeight="bold"
@@ -208,23 +221,13 @@ export default function NesConsole({
         </g>
 
         {/* RESET Button */}
-        <g transform="translate(108, 114)" onClick={handleReset}>
-          <rect
-            x="0"
-            y="0"
-            width="38"
-            height="22"
-            rx="1"
-            fill="#dce0e4"
-            stroke="#1c1e22"
-            strokeWidth="1.5"
-            className="hover:fill-white"
-          />
-          <rect x="2" y="2" width="34" height="18" fill="#cbcfd4" />
+        <g transform="translate(122, 102)" onClick={handleReset}>
+          <rect x="0" y="0" width="46" height="24" rx="1" fill="#1c1b1a" />
+          <rect x="2" y="2" width="42" height="20" rx="1" fill="#78746e" className="hover:fill-[#8c8881]" />
           <text
-            x="7"
-            y="13"
-            fill="#d82424"
+            x="9"
+            y="14"
+            fill="#a82020"
             fontSize="6"
             fontFamily="'Press Start 2P', monospace"
             fontWeight="bold"
@@ -235,52 +238,50 @@ export default function NesConsole({
         </g>
 
         {/* -------------------------------------------------------------
-            5. THE CARTRIDGE CHAMBER & HINGED DOOR FLAP (THE MAIN ATTRACTION)
+            5. THE CARTRIDGE CHAMBER (Deep recess & Horizontal Tray)
             ------------------------------------------------------------- */}
-        {/* Deep Recessed Chamber Opening Behind Door */}
+        {/* Recessed Chamber Opening Behind Door */}
         <rect
-          x="32"
+          x="26"
           y="54"
-          width="158"
-          height="38"
-          fill="#0c0d0f"
-          stroke="#26282e"
-          strokeWidth="1.5"
+          width="196"
+          height="30"
+          fill="#0a090b"
+          stroke="#1c1a1c"
+          strokeWidth="1.2"
         />
 
-        {/* Inner Cartridge Spring Tray Base */}
-        <rect x="36" y="58" width="150" height="30" fill="#18191d" />
+        {/* Spring Tray Interior */}
+        <rect x="30" y="58" width="188" height="22" fill="#161517" />
 
-        {/* Horizontal Cartridge Loaded in Tray (when door is open or closed) */}
+        {/* Horizontal Cartridge Loaded in Tray */}
         {activeGame && (
-          <g transform="translate(42, 64)">
-            {/* Grey Cartridge Casing */}
+          <g transform="translate(38, 62)">
+            {/* Cartridge Dark Plastic Casing */}
             <rect
               x="0"
               y="0"
-              width="138"
-              height="20"
+              width="172"
+              height="16"
               rx="1"
-              fill="#52565e"
-              stroke="#2c2f35"
-              strokeWidth="1"
+              fill="#3a3c42"
+              stroke="#1f2024"
+              strokeWidth="0.8"
             />
-            {/* Cartridge Top Ridge Notches */}
-            <line x1="8" y1="3" x2="130" y2="3" stroke="#3b3e44" strokeWidth="1" />
-            {/* Horizontal Spine Label (Just like Super Mario Bros./Duck Hunt in photo) */}
+            {/* Spine Label (Muted colors matching environment) */}
             <rect
-              x="14"
-              y="6"
-              width="110"
+              x="16"
+              y="3"
+              width="140"
               height="10"
               fill={activeGame.labelColor}
-              stroke="#1a1a1a"
+              stroke="#111"
               strokeWidth="0.5"
             />
-            {/* Spine Label Text */}
+            {/* Title Text on Cartridge Spine */}
             <text
-              x="20"
-              y="14"
+              x="22"
+              y="10.5"
               fill="#ffffff"
               fontSize="5.5"
               fontFamily="'Press Start 2P', monospace"
@@ -289,9 +290,9 @@ export default function NesConsole({
               {activeGame.title.toUpperCase()}
             </text>
             <text
-              x="106"
-              y="14"
-              fill="#facc15"
+              x="134"
+              y="10.5"
+              fill="#e2b43b"
               fontSize="4.5"
               fontFamily="'Press Start 2P', monospace"
             >
@@ -300,42 +301,34 @@ export default function NesConsole({
           </g>
         )}
 
-        {/* Inner Chamber Shadow Overlay */}
-        <rect
-          x="32"
-          y="54"
-          width="158"
-          height="6"
-          fill="black"
-          opacity="0.6"
-        />
+        {/* Deep Chamber Ambient Shadow */}
+        <rect x="26" y="54" width="196" height="5" fill="#000000" opacity="0.75" />
 
         {/* =============================================================
-            THE HINGED DOOR FLAP
-            - When CLOSED: Lies flat on front, covering the chamber.
-            - When OPEN: Swings UPWARD horizontally at an angle on its top hinge!
+            6. THE HINGED FLAP DOOR (CLOSED vs UPWARD-HINGED OPEN)
             ============================================================= */}
         {!isOpen ? (
-          /* CLOSED DOOR: Flat on Front Face */
-          <g className="transition-transform duration-200">
-            {/* Door Panel Body */}
+          /* CLOSED DOOR: Lies flush on the front face */
+          <g className="transition-all duration-200">
+            {/* Door Panel */}
             <rect
-              x="30"
-              y="52"
-              width="162"
-              height="42"
-              fill="url(#topChassisGrad)"
-              stroke="#8c9199"
+              x="24"
+              y="53"
+              width="200"
+              height="32"
+              fill="url(#nesUpperFace)"
+              stroke="#54514c"
               strokeWidth="1"
             />
-            {/* Top Inset Groove */}
-            <line x1="32" y1="55" x2="190" y2="55" stroke="#ffffff" strokeWidth="1" />
-            {/* Red Authentic NES Branding */}
+            {/* Top seam highlight */}
+            <line x1="25" y1="54" x2="223" y2="54" stroke="#ababa3" strokeWidth="0.8" />
+
+            {/* Vintage Muted Crimson Red NES Branding */}
             <text
-              x="38"
-              y="69"
-              fill="#d82424"
-              fontSize="8.5"
+              x="34"
+              y="68"
+              fill="#a82020"
+              fontSize="9"
               fontFamily="'Press Start 2P', monospace"
               fontWeight="bold"
               letterSpacing="-0.5"
@@ -343,9 +336,9 @@ export default function NesConsole({
               Nintendo
             </text>
             <text
-              x="38"
-              y="78"
-              fill="#d82424"
+              x="34"
+              y="77"
+              fill="#a82020"
               fontSize="5"
               fontFamily="'Press Start 2P', monospace"
               fontWeight="bold"
@@ -353,52 +346,53 @@ export default function NesConsole({
             >
               ENTERTAINMENT SYSTEM™
             </text>
-            {/* Bottom Finger Grip Ridge */}
-            <line x1="38" y1="87" x2="184" y2="87" stroke="#b0b5bc" strokeWidth="1.5" />
+
+            {/* Finger Grip Bottom Notch */}
+            <line x1="34" y1="82" x2="216" y2="82" stroke="#5b5751" strokeWidth="1.2" />
           </g>
         ) : (
-          /* OPEN DOOR: Hinged UPWARDS into 3D Space (Exactly as in photo!) */
+          /* OPEN DOOR: Hinges UPWARD at authentic angle into 3D space */
           <g className="transition-all duration-300">
-            {/* Door Shadow on chamber */}
-            <polygon points="30,52 192,52 192,56 30,56" fill="black" opacity="0.7" />
+            {/* Deep Drop Shadow Under Raised Door */}
+            <polygon points="24,52 226,52 226,57 24,57" fill="#000000" opacity="0.8" />
 
-            {/* Upward-Tilted Hinged Flap Face */}
+            {/* The Upward-Swung Flap Door */}
             <polygon
-              points="26,24 196,24 192,52 30,52"
-              fill="#e6eaee"
-              stroke="#858a92"
-              strokeWidth="1.5"
+              points="20,28 230,28 226,52 24,52"
+              fill="#a8a39a"
+              stroke="#58544f"
+              strokeWidth="1.2"
             />
-            {/* Top Lip of Open Flap */}
-            <polygon points="26,24 196,24 194,20 28,20" fill="#d2d6dc" />
+            {/* Top Edge Lip of Open Door */}
+            <polygon points="20,28 230,28 228,24 22,24" fill="#8c877f" />
 
-            {/* Red Branding visible on upward-angled face */}
+            {/* Muted Red Branding visible on upward-tilted face */}
             <text
-              x="36"
-              y="38"
-              fill="#d82424"
+              x="32"
+              y="40"
+              fill="#a82020"
               fontSize="7.5"
               fontFamily="'Press Start 2P', monospace"
               fontWeight="bold"
               letterSpacing="-0.5"
-              transform="skewX(-4)"
+              transform="skewX(-5)"
             >
               Nintendo
             </text>
             <text
-              x="36"
-              y="46"
-              fill="#d82424"
+              x="32"
+              y="48"
+              fill="#a82020"
               fontSize="4.5"
               fontFamily="'Press Start 2P', monospace"
               fontWeight="bold"
-              transform="skewX(-4)"
+              transform="skewX(-5)"
             >
               ENTERTAINMENT SYSTEM™
             </text>
 
-            {/* Door Underside Dark Lip */}
-            <line x1="30" y1="52" x2="192" y2="52" stroke="#50545a" strokeWidth="2" />
+            {/* Door Underside Shadow Ridge */}
+            <line x1="24" y1="52" x2="226" y2="52" stroke="#2a2826" strokeWidth="1.8" />
           </g>
         )}
       </svg>

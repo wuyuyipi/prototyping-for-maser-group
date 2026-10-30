@@ -48,25 +48,25 @@ export default function RetroLivingRoomPage() {
   return (
     <main className="relative h-screen w-screen overflow-hidden select-none bg-neutral-950 flex flex-col justify-between font-pixel">
       {/* ======================================================================
-          Cozy Room Background (Pixel art dark brick, magenta GAME OVER neon sign)
+          Cozy Room Background (Warm cream wall with art & doodles, purple cutting mat desk)
           ====================================================================== */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Image
           src="/images/retro_room_bg.jpg"
-          alt="Cozy retro living room pixel art background"
+          alt="Cozy retro creative studio room with lilac cutting mat desk and warm doodle wall"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center filter brightness-[0.8] contrast-[1.05]"
+          className="object-cover object-center filter brightness-[0.95] contrast-[1.02]"
         />
-        {/* Soft vignette & ambient lighting */}
-        <div className="absolute inset-0 bg-radial-at-c from-transparent via-black/25 to-black/80" />
+        {/* Subtle warm ambient vignette */}
+        <div className="absolute inset-0 bg-radial-at-c from-transparent via-transparent to-black/35" />
       </div>
 
       {/* ======================================================================
           Top Bar: Floating Game Shop Button
           ====================================================================== */}
-      <header className="relative z-30 w-full px-4 sm:px-6 py-2.5 flex justify-end items-center text-[8px] sm:text-[9px]">
+      <header className="relative z-30 w-full px-4 sm:px-6 py-2 flex justify-end items-center text-[8px] sm:text-[9px]">
         <button
           type="button"
           onClick={() => {
@@ -86,46 +86,39 @@ export default function RetroLivingRoomPage() {
       </header>
 
       {/* ======================================================================
-          UNIFIED DESK STAGE: CRT, NES, AND CARTRIDGES ALL RESTING ON THE WOODEN DESK
+          WORKSPACE SCENE: CRT MONITOR, NES CONSOLE, & CARTRIDGES
+          All resting naturally on the lilac cutting mat desk surface
           ====================================================================== */}
-      <div className="relative z-10 w-full flex-1 flex flex-col justify-end">
-        {/* The Wooden Tabletop Desk Surface */}
-        <div className="relative w-full desk-surface desk-wood-grain pt-2 pb-3 px-4 sm:px-8 shadow-[0_-15px_30px_rgba(0,0,0,0.95)]">
-          {/* Ambient warm lamp light sheen across the top edge of the wooden desk */}
-          <div className="absolute inset-x-0 top-0 h-1 bg-amber-400/25 pointer-events-none" />
+      <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-between px-3 sm:px-8 pb-3 pt-0">
+        {/* 1. CRT Monitor: Front and Center, vintage cream chassis resting on the cutting mat */}
+        <div className="w-full flex-1 flex items-center justify-center my-auto min-h-0">
+          <CrtMonitor
+            activeGame={activeGame}
+            onEjectGame={handleEjectGame}
+            onOpenCartridgeSlot={handleOpenSlot}
+            onEarnPoints={handleEarnPoints}
+          />
+        </div>
 
-          <div className="max-w-6xl mx-auto relative flex flex-col items-center">
-            {/* 1. CRT Monitor: Front and Center, sitting directly on the wooden desk surface */}
-            <div className="relative z-10 -mt-64 sm:-mt-72 md:-mt-80 mb-2 flex justify-center">
-              <CrtMonitor
-                activeGame={activeGame}
-                onEjectGame={handleEjectGame}
-                onOpenCartridgeSlot={handleOpenSlot}
-                onEarnPoints={handleEarnPoints}
-              />
-            </div>
+        {/* 2. Desk Gear: NES Console & Cartridge Pile resting on the cutting mat */}
+        <div className="w-full max-w-5xl flex flex-row items-end justify-start gap-4 sm:gap-6 relative z-20 shrink-0 -mt-6 sm:-mt-8">
+          {/* Bottom-Left: NES Console resting on the cutting mat */}
+          <div className="flex items-end shrink-0">
+            <NesConsole
+              activeGame={activeGame}
+              isSlotOpen={isSlotModalOpen}
+              onOpenCartridgeSlot={handleOpenSlot}
+            />
+          </div>
 
-            {/* 2. Desk Gear: NES Console & Cartridge Pile resting on the exact same desk surface */}
-            <div className="w-full flex flex-row items-end justify-start gap-4 sm:gap-8 relative z-20">
-              {/* Bottom-Left: NES Console resting on the wood */}
-              <div className="flex items-end shrink-0">
-                <NesConsole
-                  activeGame={activeGame}
-                  isSlotOpen={isSlotModalOpen}
-                  onOpenCartridgeSlot={handleOpenSlot}
-                />
-              </div>
-
-              {/* Next to NES (Not blocking CRT): Stack of Owned Cartridges on the wood */}
-              <div className="flex items-end shrink-0 pb-1">
-                <CartridgePile
-                  games={games}
-                  activeGame={activeGame}
-                  onSelectGame={handleSelectGame}
-                  onOpenCartridgeSlot={handleOpenSlot}
-                />
-              </div>
-            </div>
+          {/* Beside NES (Not blocking CRT): Stack of Owned Cartridges on the cutting mat */}
+          <div className="flex items-end shrink-0 pb-1">
+            <CartridgePile
+              games={games}
+              activeGame={activeGame}
+              onSelectGame={handleSelectGame}
+              onOpenCartridgeSlot={handleOpenSlot}
+            />
           </div>
         </div>
       </div>

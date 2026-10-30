@@ -57,29 +57,29 @@ export default function NesConsole({
             <stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </radialGradient>
 
-          {/* Warm room lighting gradients */}
-          {/* Top cover: Warm muted grey with slight amber ambient reflection */}
+          {/* Warm studio room lighting gradients */}
+          {/* Top cover: Authentic NES light grey with subtle warm ambient sheen */}
           <linearGradient id="nesTopLid" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#a39e97" />
-            <stop offset="100%" stopColor="#87837c" />
+            <stop offset="0%" stopColor="#d5d2cc" />
+            <stop offset="100%" stopColor="#bfbcb5" />
           </linearGradient>
 
-          {/* Front upper face: Soft warm light grey */}
+          {/* Front upper face: Authentic NES soft light grey */}
           <linearGradient id="nesUpperFace" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#96928b" />
-            <stop offset="100%" stopColor="#7a766f" />
+            <stop offset="0%" stopColor="#cac6be" />
+            <stop offset="100%" stopColor="#b4b0a8" />
           </linearGradient>
 
-          {/* Lower chassis: Deep warm charcoal / shadow */}
+          {/* Lower chassis: Authentic NES dark slate grey */}
           <linearGradient id="nesLowerBase" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3d3a38" />
-            <stop offset="100%" stopColor="#252322" />
+            <stop offset="0%" stopColor="#4c4e54" />
+            <stop offset="100%" stopColor="#323438" />
           </linearGradient>
 
-          {/* Recessed black grill band: Dark moody black */}
+          {/* Recessed black grill band: Deep charcoal black */}
           <linearGradient id="nesBlackBand" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a1819" />
-            <stop offset="100%" stopColor="#0d0c0d" />
+            <stop offset="0%" stopColor="#1e1e20" />
+            <stop offset="100%" stopColor="#111113" />
           </linearGradient>
 
           {/* Ambient red LED glow */}
@@ -359,12 +359,12 @@ export default function NesConsole({
             {/* The Upward-Swung Flap Door */}
             <polygon
               points="20,28 230,28 226,52 24,52"
-              fill="#a8a39a"
-              stroke="#58544f"
+              fill="url(#nesUpperFace)"
+              stroke="#6b6760"
               strokeWidth="1.2"
             />
             {/* Top Edge Lip of Open Door */}
-            <polygon points="20,28 230,28 228,24 22,24" fill="#8c877f" />
+            <polygon points="20,28 230,28 228,24 22,24" fill="#a49f97" />
 
             {/* Muted Red Branding visible on upward-tilted face */}
             <text

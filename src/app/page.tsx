@@ -59,10 +59,17 @@ export default function RetroLivingRoomPage() {
 
   const handlePurchaseGame = (item: ShopItem) => {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
-    // Also unlock the next locked playable cartridge when purchasing in the shop
-    const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
-    if (nextLocked) {
-      setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
+    // If the purchased item corresponds to a specific registered game, unlock it directly
+    if (games.some((g) => g.id === item.id)) {
+      setUnlockedGameIds((prev) =>
+        prev.includes(item.id) ? prev : [...prev, item.id]
+      );
+    } else {
+      // Otherwise unlock next locked playable cartridge
+      const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
+      if (nextLocked) {
+        setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
+      }
     }
   };
 
@@ -195,6 +202,7 @@ export default function RetroLivingRoomPage() {
       <ShopModal
         isOpen={isShopModalOpen}
         playerPoints={playerPoints}
+        unlockedGameIds={unlockedGameIds}
         onClose={() => setIsShopModalOpen(false)}
         onPurchaseGame={handlePurchaseGame}
       />

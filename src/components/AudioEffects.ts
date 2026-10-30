@@ -20,7 +20,7 @@ function getAudioContext(): AudioContext | null {
 }
 
 export function playSound(
-  type: "slotOpen" | "insertCartridge" | "powerSwitch" | "blip" | "eject"
+  type: "slotOpen" | "insertCartridge" | "powerSwitch" | "blip" | "eject" | "coin"
 ) {
   try {
     const ctx = getAudioContext();
@@ -32,7 +32,16 @@ export function playSound(
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    if (type === "slotOpen") {
+    if (type === "coin") {
+      // Classic 8-bit coin chime (B5 -> E6)
+      osc.type = "square";
+      osc.frequency.setValueAtTime(987, now);
+      osc.frequency.setValueAtTime(1318, now + 0.08);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } else if (type === "slotOpen") {
       // Mechanical latch click & spring opening
       osc.type = "square";
       osc.frequency.setValueAtTime(240, now);

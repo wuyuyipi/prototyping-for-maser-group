@@ -9,6 +9,8 @@ import NesConsole from "@/components/NesConsole";
 import NesController from "@/components/NesController";
 import CartridgePile from "@/components/CartridgePile";
 import CartridgeModal from "@/components/CartridgeModal";
+import ShopModal from "@/components/shop/ShopModal";
+import { ShopItem } from "@/components/shop/types";
 import { playSound } from "@/components/AudioEffects";
 
 export default function RetroLivingRoomPage() {
@@ -16,6 +18,8 @@ export default function RetroLivingRoomPage() {
   // Default to first game or null
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
+  const [isShopModalOpen, setIsShopModalOpen] = useState(false);
+  const [playerPoints, setPlayerPoints] = useState<number>(1250);
   const [showGuide, setShowGuide] = useState(false);
 
   const handleOpenSlot = () => {
@@ -33,6 +37,10 @@ export default function RetroLivingRoomPage() {
   const handleEjectGame = () => {
     playSound("eject");
     setActiveGame(null);
+  };
+
+  const handlePurchaseGame = (item: ShopItem) => {
+    setPlayerPoints((prev) => Math.max(0, prev - item.price));
   };
 
   return (
@@ -53,27 +61,52 @@ export default function RetroLivingRoomPage() {
         <div className="absolute inset-0 bg-radial-at-c from-transparent via-black/30 to-black/85" />
       </div>
 
-      {/* Top Floating Header & Info Toggle */}
+      {/* ======================================================================
+          Top Floating Header: Arcade Marquee, Points, and Shop Button
+          ====================================================================== */}
       <header className="relative z-20 w-full px-4 sm:px-6 py-2.5 flex justify-between items-center text-[8px] sm:text-[9px]">
-        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded border border-neutral-800">
+        {/* Arcade Status Badge */}
+        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xs px-2.5 py-1.5 rounded border border-neutral-800">
           <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span className="text-yellow-400 font-bold tracking-wider">
             RETRO ARCADE SETUP
           </span>
           {activeGame && (
-            <span className="text-neutral-400 border-l border-neutral-700 pl-2">
+            <span className="text-neutral-400 border-l border-neutral-700 pl-2 hidden sm:inline">
               LOADED: {activeGame.title}
             </span>
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={() => setShowGuide((v) => !v)}
-          className="bg-black/60 hover:bg-black/80 text-cyan-400 hover:text-cyan-300 px-2 py-1 rounded border border-cyan-900 cursor-pointer transition-colors"
-        >
-          {showGuide ? "✕ HIDE GUIDE" : "ℹ TEAM GUIDE"}
-        </button>
+        {/* Action Controls: Shop Button & Team Guide */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Shop Feature Button */}
+          <button
+            type="button"
+            onClick={() => {
+              playSound("coin");
+              setIsShopModalOpen(true);
+            }}
+            aria-label="Open Game Shop"
+            title="Open shop shelf to buy new games with points"
+            className="bg-neutral-900/90 hover:bg-neutral-800 text-yellow-300 px-3 py-1.5 rounded border-2 border-yellow-500/80 hover:border-yellow-400 pixel-border-sm cursor-pointer transition-all flex items-center gap-2 shadow-[0_0_14px_rgba(234,179,8,0.35)] active:translate-y-0.5"
+          >
+            <span className="text-xs">🏪</span>
+            <span className="font-bold tracking-wider">GAME SHOP</span>
+            <span className="bg-neutral-950 px-1.5 py-0.5 rounded text-[8px] text-amber-400 border border-yellow-600/50">
+              🪙 {playerPoints.toLocaleString()} PTS
+            </span>
+          </button>
+
+          {/* Team Collaboration Guide */}
+          <button
+            type="button"
+            onClick={() => setShowGuide((v) => !v)}
+            className="bg-black/60 hover:bg-black/80 text-cyan-400 hover:text-cyan-300 px-2.5 py-1.5 rounded border border-cyan-900 cursor-pointer transition-colors"
+          >
+            {showGuide ? "✕ HIDE" : "ℹ DEV GUIDE"}
+          </button>
+        </div>
       </header>
 
       {/* Teammate Guide Modal / Overlay */}
@@ -90,6 +123,9 @@ export default function RetroLivingRoomPage() {
           </p>
           <p>
             • <strong>Registry</strong>: Register in <code className="text-yellow-400">src/games/registry.ts</code>.
+          </p>
+          <p>
+            • <strong>Shop Feature</strong>: Collaborator builds inside <code className="text-amber-400">src/components/shop/</code>.
           </p>
           <p className="text-neutral-500 pt-1">
             Click anywhere on the background to close this guide.
@@ -158,6 +194,14 @@ export default function RetroLivingRoomPage() {
         activeGame={activeGame}
         onClose={handleCloseSlot}
         onSelectGame={handleSelectGame}
+      />
+
+      {/* Shop Feature Modal (Triggered by clicking the Game Shop button) */}
+      <ShopModal
+        isOpen={isShopModalOpen}
+        playerPoints={playerPoints}
+        onClose={() => setIsShopModalOpen(false)}
+        onPurchaseGame={handlePurchaseGame}
       />
     </main>
   );

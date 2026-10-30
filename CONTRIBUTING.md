@@ -19,6 +19,17 @@ Here is where each shared piece lives:
 | **`src/games/registry.ts`** | Central Game Registry | The single array where all games are plugged into the system. |
 | **`src/games/types.ts`** | Game Types | Standard TypeScript interface (`GameDefinition`, `GameMetadata`, `GameComponentProps`). |
 | **`src/games/placeholder-template/`** | Game Starter Template | Cloneable starter component (`GameTemplate.tsx`) to build your game. |
+| **`src/components/shop/`** | Game Shop Feature | Dedicated folder (`ShopModal.tsx`, `shopCatalog.ts`, `types.ts`) for the collaborator building the game purchase system. |
+
+---
+
+## 🏪 Shop Feature Development (For Shop Collaborator)
+
+The shop button on the main screen opens the shelf modal where players spend points to buy new cartridges.
+- **Shop Files**: [`src/components/shop/`](file:///Users/yipin/Desktop/SVA%20School%20Work/Fall%202026/Prototyping%20for%20Master/prototyping-for-maser-arcade/src/components/shop/)
+- **Catalog**: Edit available cartridges and prices in [`src/components/shop/shopCatalog.ts`](file:///Users/yipin/Desktop/SVA%20School%20Work/Fall%202026/Prototyping%20for%20Master/prototyping-for-maser-arcade/src/components/shop/shopCatalog.ts).
+- **Branch**: Create branch `feat/shop-feature` to keep your work isolated.
+- **Props**: `ShopModal` receives `playerPoints`, `onPurchaseGame`, and `onClose`. Add your custom shelf layout, filter tags, or point rewarding logic here.
 
 ---
 

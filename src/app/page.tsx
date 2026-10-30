@@ -149,10 +149,10 @@ export default function RetroLivingRoomPage() {
           Arranged per user reference layout diagram:
           - CRT: Large, front and center on the desk
           - NES: Bottom-left, overlapping bottom-left corner of the CRT bezel
-          - Cartridges: Bottom-right, stacked horizontally on the desk
+          - Cartridges: Shifted further to the right to avoid blocking TV controls
           ====================================================================== */}
-      <div className="relative z-10 w-full flex-1 flex flex-col justify-end items-center px-3 sm:px-6 md:px-8 pb-3 pt-0">
-        <div className="relative w-full max-w-4xl lg:max-w-5xl flex flex-col items-center">
+      <div className="relative z-10 w-full flex-1 flex flex-col justify-end items-center px-2 sm:px-6 md:px-8 pb-3 pt-0">
+        <div className="relative w-full max-w-6xl xl:max-w-7xl flex flex-col items-center">
           {/* 1. CRT Monitor: Front and Center on the desk */}
           <div className="relative z-10 w-full flex justify-center">
             <CrtMonitor
@@ -163,8 +163,8 @@ export default function RetroLivingRoomPage() {
             />
           </div>
 
-          {/* 2. Desk Foreground Row: NES on Left (overlapping CRT bottom-left), Cartridges on Right */}
-          <div className="w-full flex flex-row items-end justify-between relative z-20 -mt-8 sm:-mt-12 md:-mt-14 pointer-events-none px-1 sm:px-3">
+          {/* 2. Desk Foreground Row: NES on Left (overlapping CRT bottom-left), Cartridges moved far Right */}
+          <div className="w-full flex flex-row items-end justify-between relative z-20 -mt-8 sm:-mt-12 md:-mt-14 pointer-events-none px-2 sm:px-4 lg:px-8">
             {/* Bottom-Left: NES Console overlapping bottom-left corner of the CRT */}
             <div className="pointer-events-auto flex items-end">
               <NesConsole
@@ -174,8 +174,8 @@ export default function RetroLivingRoomPage() {
               />
             </div>
 
-            {/* Bottom-Right: Stack of Cartridges in bottom-right corner of the desk */}
-            <div className="pointer-events-auto flex items-end pb-1 sm:pb-2">
+            {/* Bottom-Right: Stack of Cartridges moved further right to avoid blocking TV buttons */}
+            <div className="pointer-events-auto flex items-end pb-1 translate-x-2 sm:translate-x-6 md:translate-x-10 lg:translate-x-16">
               <CartridgePile
                 games={games}
                 activeGame={activeGame}

@@ -717,11 +717,11 @@ export default function SuperPixelBrosGame({
       // Small "JUSTIN'S ADVENTURE" title in Top-Left of TV screen
       ctx.fillStyle = "#ffffff";
       ctx.font = "5px 'Press Start 2P', monospace";
-      ctx.fillText("JUSTIN'S ADVENTURE", 8, 10);
+      ctx.fillText("JUSTIN'S ADVENTURE", 14, 11);
 
       ctx.font = "7px 'Press Start 2P', monospace";
       ctx.fillStyle = "#facc15";
-      ctx.fillText(state.score.toString().padStart(6, "0"), 8, 23);
+      ctx.fillText(state.score.toString().padStart(6, "0"), 14, 24);
 
       ctx.fillStyle = "#fde047";
       ctx.fillText("🪙x" + state.coins.toString().padStart(2, "0"), 96, 23);
@@ -748,6 +748,11 @@ export default function SuperPixelBrosGame({
         className="w-full h-full object-contain"
         style={{ imageRendering: "pixelated" }}
       />
+
+      {/* Small "JUSTIN'S ADVENTURE" Title Badge in Top-Left of TV Screen */}
+      <div className="absolute top-2.5 left-4 z-10 text-[7px] sm:text-[8px] text-yellow-300 bg-black/75 border border-yellow-400/60 px-2 py-0.5 rounded pointer-events-none tracking-wider shadow-sm">
+        JUSTIN&apos;S ADVENTURE
+      </div>
 
       {/* Interactive Game Over / Victory Overlay with 2x Larger 360-Spinning Justin Photo */}
       {(gameOver || won) && (

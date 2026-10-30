@@ -67,7 +67,7 @@ export default function ShopModal({
 
   // Map stores to their landmark tiles
   const landmarkStoreMap: Record<number, ShopItem> = {
-    5: shopItems.find((i) => i.id === "shop-game-1")!,
+    5: (shopItems.find((i) => i.id === "fruit-ninja") || shopItems.find((i) => i.id === "shop-game-1"))!,
     11: shopItems.find((i) => i.id === "shop-game-2")!,
     21: shopItems.find((i) => i.id === "shop-game-3")!,
     26: shopItems.find((i) => i.id === "shop-game-4")!,

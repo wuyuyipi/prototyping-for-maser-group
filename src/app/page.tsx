@@ -14,16 +14,16 @@ import { playSound } from "@/components/AudioEffects";
 
 export default function RetroLivingRoomPage() {
   const [games] = useState<GameDefinition[]>(GAMES_REGISTRY);
-  // Initially only the first game (Fruit Ninja) is unlocked; later 2 games require points!
+  // Default unlocked games: Super Pixel Bros. & Tetris. Pixel Fruits is bought from the Game Shop!
   const [unlockedGameIds, setUnlockedGameIds] = useState<string[]>(() =>
     GAMES_REGISTRY.filter((g) => g.initiallyUnlocked !== false).map((g) => g.id)
   );
-  // Default to first game (Pixel Fruit Ninja)
+  // Default to first game (Super Pixel Bros.)
   const [activeGame, setActiveGame] = useState<GameDefinition | null>(games[0]);
   const [isSlotModalOpen, setIsSlotModalOpen] = useState(false);
   const [isShopModalOpen, setIsShopModalOpen] = useState(false);
-  // Initial points set to 0
-  const [playerPoints, setPlayerPoints] = useState<number>(0);
+  // Initial points set to 400 so user can test buying Pixel Fruits (300 PTS) in the shop or earn more!
+  const [playerPoints, setPlayerPoints] = useState<number>(400);
   const [recentPointsGain, setRecentPointsGain] = useState<{
     amount: number;
     id: number;
@@ -59,10 +59,16 @@ export default function RetroLivingRoomPage() {
 
   const handlePurchaseGame = (item: ShopItem) => {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
-    // Also unlock the next locked playable cartridge when purchasing in the shop
-    const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
-    if (nextLocked) {
-      setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
+    // If purchasing Pixel Fruit Ninja in the shop, unlock it so it appears in the desk pile!
+    if (item.id === "fruit-ninja" || item.title.toLowerCase().includes("fruit")) {
+      setUnlockedGameIds((prev) =>
+        prev.includes("fruit-ninja") ? prev : [...prev, "fruit-ninja"]
+      );
+    } else {
+      const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
+      if (nextLocked) {
+        setUnlockedGameIds((prev) => [...prev, nextLocked.id]);
+      }
     }
   };
 

@@ -19,37 +19,15 @@ export default function CartridgePile({
   games,
   activeGame,
   unlockedGameIds,
-  playerPoints,
   onSelectGame,
-  onUnlockGame,
-  onOpenCartridgeSlot,
 }: CartridgePileProps) {
-  const [lockNotice, setLockNotice] = useState<string | null>(null);
+  // Only show the cartridges the user owns in the desk pile.
+  // When a new cartridge (like Pixel Fruits) is bought from the shop, it is added here!
+  const ownedGames = games.filter((game) => unlockedGameIds.includes(game.id));
 
   const handleCartridgeClick = (game: GameDefinition) => {
-    const isUnlocked = unlockedGameIds.includes(game.id);
-    if (isUnlocked) {
-      playSound("insertCartridge");
-      onSelectGame(game);
-      return;
-    }
-
-    const price = game.price || 0;
-    if (playerPoints >= price) {
-      const success = onUnlockGame(game);
-      if (success) {
-        playSound("coin");
-        setLockNotice(`🎉 UNLOCKED ${game.title.toUpperCase()}!`);
-        setTimeout(() => setLockNotice(null), 2200);
-        onSelectGame(game);
-      }
-    } else {
-      playSound("blockHit");
-      setLockNotice(
-        `🔒 NEED ${price} PTS TO UNLOCK ${game.title.toUpperCase()}! (HAVE ${playerPoints} PTS)`
-      );
-      setTimeout(() => setLockNotice(null), 2500);
-    }
+    playSound("insertCartridge");
+    onSelectGame(game);
   };
 
   return (
@@ -57,20 +35,10 @@ export default function CartridgePile({
       {/* Soft table contact shadow beneath the cartridges on the purple cutting mat */}
       <div className="absolute -bottom-2 inset-x-2 h-4 bg-black/60 rounded-full filter blur-xs pointer-events-none" />
 
-      {/* Floating Notice when clicking a locked cartridge */}
-      {lockNotice && (
-        <div className="absolute -top-9 right-0 bg-neutral-950/95 border-2 border-amber-400 text-amber-300 px-2.5 py-1 rounded text-[7px] sm:text-[8px] font-bold whitespace-nowrap shadow-[0_0_15px_rgba(251,191,36,0.6)] z-50 animate-bounce">
-          {lockNotice}
-        </div>
-      )}
-
       {/* Cartridge Stack: Horizontally-oriented cartridges stacked vertically on the right desk surface */}
       <div className="flex flex-col space-y-1.5 sm:space-y-2 relative z-10">
-        {games.map((game, idx) => {
+        {ownedGames.map((game, idx) => {
           const isCurrent = activeGame?.id === game.id;
-          const isUnlocked = unlockedGameIds.includes(game.id);
-          const price = game.price || 0;
-          const canAfford = playerPoints >= price;
           const shellColor = game.cartridgeColor || "#4b4e54";
 
           return (
@@ -78,11 +46,7 @@ export default function CartridgePile({
               key={game.id}
               type="button"
               onClick={() => handleCartridgeClick(game)}
-              title={
-                isUnlocked
-                  ? `Load ${game.title} into NES`
-                  : `Unlock ${game.title} for ${price} PTS`
-              }
+              title={`Load ${game.title} into NES`}
               style={{
                 zIndex: 10 + idx,
                 backgroundColor: shellColor,
@@ -112,22 +76,10 @@ export default function CartridgePile({
                   </span>
                 </div>
 
-                {/* Status Badges */}
-                {isCurrent && isUnlocked && (
+                {/* Current game inserted badge */}
+                {isCurrent && (
                   <span className="text-[6px] text-yellow-300 ml-1.5 shrink-0 bg-black/80 px-1 py-0.5 rounded-xs font-bold border border-yellow-500/50">
                     IN NES
-                  </span>
-                )}
-
-                {!isUnlocked && (
-                  <span
-                    className={`text-[6px] ml-1.5 shrink-0 px-1 py-0.5 rounded-xs font-bold border ${
-                      canAfford
-                        ? "bg-emerald-600 text-white border-emerald-300 animate-pulse"
-                        : "bg-black/85 text-amber-300 border-amber-500/80"
-                    }`}
-                  >
-                    {canAfford ? `🔓 BUY ${price}P` : `🔒 ${price}P`}
                   </span>
                 )}
               </div>

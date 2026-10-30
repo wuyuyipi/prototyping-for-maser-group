@@ -6,32 +6,12 @@ import FruitNinjaGame from "./fruit-ninja/FruitNinjaGame";
 /**
  * =======================================================================
  * RETRO ARCADE GAME REGISTRY
- * 1. Pixel Fruit Ninja (Unlocked by default - play to earn points!)
- * 2. Super Pixel Bros. (Requires 300 PTS to unlock)
- * 3. Tetris (Requires 500 PTS to unlock)
+ * 1. Super Pixel Bros. (Unlocked by default)
+ * 2. Tetris (Unlocked by default)
+ * 3. Pixel Fruit Ninja (Available to buy from the Game Shop for 300 PTS)
  * =======================================================================
  */
 export const GAMES_REGISTRY: GameDefinition[] = [
-  {
-    id: "fruit-ninja",
-    title: "Pixel Fruit Ninja",
-    author: "Mingtai",
-    year: 1987,
-    genre: "Dojo Slasher",
-    description:
-      "Slash flying pixel watermelons & golden peaches with your katana, rack up combos, and dodge bombs!",
-    instructions:
-      "Swipe mouse across the CRT screen (or press Space) to slash fruits. Avoid bombs! R to restart.",
-    cartridgeColor: "#14532d",
-    labelColor: "#15803d",
-    accentColor: "#ef4444",
-    labelBadge: "NES-FN-USA",
-    pixelArtIcon: "🍉",
-    status: "ready",
-    price: 0,
-    initiallyUnlocked: true,
-    Component: FruitNinjaGame,
-  },
   {
     id: "super-pixel-bros",
     title: "Super Pixel Bros.",
@@ -48,8 +28,8 @@ export const GAMES_REGISTRY: GameDefinition[] = [
     labelBadge: "NES-SM-USA",
     pixelArtIcon: "🍄",
     status: "ready",
-    price: 300,
-    initiallyUnlocked: false,
+    price: 0,
+    initiallyUnlocked: true,
     Component: SuperPixelBrosGame,
   },
   {
@@ -68,9 +48,29 @@ export const GAMES_REGISTRY: GameDefinition[] = [
     labelBadge: "NES-EI-USA",
     pixelArtIcon: "🧱",
     status: "ready",
-    price: 500,
-    initiallyUnlocked: false,
+    price: 0,
+    initiallyUnlocked: true,
     Component: TetrisGame,
+  },
+  {
+    id: "fruit-ninja",
+    title: "Pixel Fruit Ninja",
+    author: "Mingtai",
+    year: 1987,
+    genre: "Dojo Slasher",
+    description:
+      "Slash flying pixel watermelons & golden peaches with your katana, rack up combos, and dodge bombs!",
+    instructions:
+      "Swipe mouse across the CRT screen (or press Space) to slash fruits. Avoid bombs! R to restart.",
+    cartridgeColor: "#14532d",
+    labelColor: "#15803d",
+    accentColor: "#ef4444",
+    labelBadge: "NES-FN-USA",
+    pixelArtIcon: "🍉",
+    status: "ready",
+    price: 300,
+    initiallyUnlocked: false,
+    Component: FruitNinjaGame,
   },
 ];
 

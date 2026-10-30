@@ -1,20 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  --background: #111116;
+  --background: #08060b;
   --foreground: #e5e5e5;
   --font-pixel: "Press Start 2P", "Courier New", monospace;
   --font-vt: "VT323", monospace;
 }
 
+html,
 body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-pixel);
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
   -webkit-font-smoothing: none;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,7 +30,7 @@ body {
 }
 
 /* ==========================================================================
-   Pixel Art Borders & Box Shadows (Clean 8-bit styling)
+   Pixel Art Borders & Outlines
    ========================================================================== */
 .pixel-border {
   box-shadow: 
@@ -46,36 +48,11 @@ body {
     2px 0 0 0 #000;
 }
 
-.pixel-border-light {
-  box-shadow: 
-    0 -3px 0 0 #52525b,
-    0 3px 0 0 #09090b,
-    -3px 0 0 0 #52525b,
-    3px 0 0 0 #09090b;
-}
-
-.pixel-inset {
-  box-shadow: 
-    inset 0 3px 0 0 rgba(0,0,0,0.6),
-    inset 3px 0 0 0 rgba(0,0,0,0.6),
-    inset 0 -3px 0 0 rgba(255,255,255,0.2),
-    inset -3px 0 0 0 rgba(255,255,255,0.2);
-}
-
-.pixel-outset {
-  box-shadow: 
-    inset 0 3px 0 0 rgba(255,255,255,0.4),
-    inset 3px 0 0 0 rgba(255,255,255,0.4),
-    inset 0 -3px 0 0 rgba(0,0,0,0.6),
-    inset -3px 0 0 0 rgba(0,0,0,0.6);
-}
-
-/* NES console bevel */
 .nes-bevel {
-  border-top: 3px solid #d4d4d8;
-  border-left: 3px solid #d4d4d8;
-  border-right: 3px solid #52525b;
-  border-bottom: 3px solid #3f3f46;
+  border-top: 3px solid #e2e8f0;
+  border-left: 3px solid #e2e8f0;
+  border-right: 3px solid #475569;
+  border-bottom: 3px solid #334155;
 }
 
 /* ==========================================================================
@@ -84,9 +61,9 @@ body {
 .crt-screen-container {
   position: relative;
   overflow: hidden;
-  border-radius: 20px;
-  background: radial-gradient(circle at center, #18281a 0%, #050a06 80%, #000000 100%);
-  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.95), inset 0 0 10px rgba(74, 222, 128, 0.2);
+  border-radius: 18px;
+  background: radial-gradient(circle at center, #111a12 0%, #060b07 80%, #000000 100%);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.98), inset 0 0 10px rgba(74, 222, 128, 0.15);
 }
 
 /* Scanlines overlay */
@@ -95,8 +72,8 @@ body {
     to bottom,
     rgba(255, 255, 255, 0),
     rgba(255, 255, 255, 0) 50%,
-    rgba(0, 0, 0, 0.35) 50%,
-    rgba(0, 0, 0, 0.35)
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.4)
   );
   background-size: 100% 4px;
   pointer-events: none;
@@ -116,12 +93,29 @@ body {
 /* CRT Screen curvature reflection overlay */
 .crt-curvature {
   background: radial-gradient(
-    circle at 50% 30%,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.01) 40%,
-    rgba(0, 0, 0, 0.45) 85%
+    circle at 45% 25%,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    rgba(0, 0, 0, 0.5) 85%
   );
   pointer-events: none;
+}
+
+/* Cozy Wood Desk & Ambient Glow */
+.desk-surface {
+  background: linear-gradient(to bottom, #3b2216 0%, #29160e 25%, #1c0e09 70%, #120906 100%);
+  border-top: 4px solid #5a3623;
+  box-shadow: inset 0 6px 15px rgba(0, 0, 0, 0.7), 0 -12px 30px rgba(0, 0, 0, 0.85);
+}
+
+.desk-wood-grain {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(0, 0, 0, 0.08) 40px,
+    rgba(0, 0, 0, 0.08) 80px
+  );
 }
 
 /* ==========================================================================

@@ -22,7 +22,6 @@ export default function CartridgeModal({
 }: CartridgeModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  // Sync native <dialog> state
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -34,7 +33,6 @@ export default function CartridgeModal({
     }
   }, [isOpen]);
 
-  // Handle native close events (e.g. Escape key)
   const handleClose = () => {
     playSound("eject");
     onClose();
@@ -51,22 +49,19 @@ export default function CartridgeModal({
       ref={dialogRef}
       onClose={handleClose}
       aria-labelledby="cartridge-modal-title"
-      className="bg-neutral-900 text-neutral-100 border-4 border-neutral-700 p-4 sm:p-6 rounded-lg max-w-4xl w-[95vw] max-h-[90vh] overflow-y-auto pixel-border shadow-2xl m-auto"
+      className="bg-neutral-900/95 text-neutral-100 border-4 border-neutral-700 p-4 sm:p-6 rounded-lg max-w-4xl w-[92vw] max-h-[85vh] overflow-y-auto pixel-border shadow-2xl m-auto backdrop:bg-black/80"
     >
-      {/* Modal Header */}
-      <div className="flex justify-between items-start border-b-2 border-neutral-700 pb-3 mb-4">
+      {/* Header */}
+      <div className="flex justify-between items-center border-b-2 border-neutral-700 pb-3 mb-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📂</span>
-            <h2
-              id="cartridge-modal-title"
-              className="text-xs sm:text-sm font-bold text-yellow-300 font-pixel tracking-wider"
-            >
-              NES CARTRIDGE SLOT - CHOOSE GAME
-            </h2>
-          </div>
-          <p className="text-[9px] sm:text-[10px] text-neutral-400 font-pixel mt-1">
-            Select a front-facing game cartridge to load into the console.
+          <h2
+            id="cartridge-modal-title"
+            className="text-xs sm:text-sm font-bold text-yellow-300 font-pixel tracking-wider"
+          >
+            NES CARTRIDGE SLOT - SELECT GAME
+          </h2>
+          <p className="text-[8px] sm:text-[9px] text-neutral-400 font-pixel mt-1">
+            Click any front-facing game to load it into the NES console.
           </p>
         </div>
 
@@ -74,15 +69,14 @@ export default function CartridgeModal({
           type="button"
           onClick={handleClose}
           autoFocus
-          aria-label="Close cartridge slot"
-          className="px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-red-400 hover:text-red-300 font-pixel text-xs pixel-border-sm cursor-pointer"
+          className="px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-red-400 hover:text-red-300 font-pixel text-[10px] pixel-border-sm cursor-pointer"
         >
           ✕ CLOSE [ESC]
         </button>
       </div>
 
-      {/* Front-Facing Cartridge Showcase Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 justify-items-center py-2">
+      {/* Front-facing Cartridges Showcase */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center py-2">
         {games.map((game) => {
           const isSelected = activeGame?.id === game.id;
           return (
@@ -93,24 +87,24 @@ export default function CartridgeModal({
                 isSelected={isSelected}
                 onSelect={handleGameSelect}
               />
-              <div className="mt-2 text-center max-w-[200px]">
-                <div className="text-[10px] font-pixel text-neutral-300 font-bold truncate">
+              <div className="mt-2 text-center max-w-[160px]">
+                <div className="text-[9px] font-pixel text-neutral-200 font-bold truncate">
                   {game.title}
                 </div>
-                <div className="text-[8px] font-pixel text-neutral-500">
-                  By {game.author} ({game.year})
+                <div className="text-[7px] font-pixel text-neutral-400">
+                  {game.author}
                 </div>
                 {isSelected ? (
-                  <span className="inline-block mt-1 text-[8px] bg-red-900/80 text-yellow-300 px-2 py-0.5 rounded font-pixel">
+                  <span className="inline-block mt-1 text-[7px] bg-red-900 text-yellow-300 px-2 py-0.5 rounded font-pixel">
                     ● INSERTED
                   </span>
                 ) : (
                   <button
                     type="button"
                     onClick={() => handleGameSelect(game)}
-                    className="inline-block mt-1 text-[8px] bg-neutral-800 hover:bg-yellow-500 hover:text-black text-neutral-300 px-2 py-1 rounded font-pixel transition-colors border border-neutral-700 cursor-pointer"
+                    className="inline-block mt-1 text-[7px] bg-neutral-800 hover:bg-yellow-500 hover:text-black text-neutral-300 px-2 py-0.5 rounded font-pixel border border-neutral-700 cursor-pointer"
                   >
-                    INSERT GAME
+                    INSERT
                   </button>
                 )}
               </div>
@@ -119,15 +113,13 @@ export default function CartridgeModal({
         })}
       </div>
 
-      {/* Modal Footer / Teammate Instructions */}
-      <div className="mt-6 pt-3 border-t-2 border-neutral-700 flex flex-col sm:flex-row justify-between items-center text-[9px] text-neutral-400 font-pixel gap-2">
-        <span>🎮 TEAM COLLABORATION: Add new games in `src/games/`</span>
+      <div className="mt-4 pt-2 border-t border-neutral-700 text-right">
         <button
           type="button"
           onClick={handleClose}
-          className="text-yellow-400 hover:underline cursor-pointer"
+          className="text-[8px] font-pixel text-neutral-400 hover:text-white underline cursor-pointer"
         >
-          Back to NES Console
+          Return to Living Room
         </button>
       </div>
     </dialog>

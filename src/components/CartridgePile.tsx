@@ -2,7 +2,6 @@
 
 import React from "react";
 import { GameDefinition } from "../games/types";
-import CartridgeItem from "./CartridgeItem";
 import { playSound } from "./AudioEffects";
 
 interface CartridgePileProps {
@@ -24,50 +23,69 @@ export default function CartridgePile({
   };
 
   return (
-    <div className="flex-1 min-w-[280px] max-w-md bg-neutral-900/80 p-3 sm:p-4 rounded-xs border-2 border-neutral-700 shadow-xl font-pixel">
-      {/* Shelf / Pile Header */}
-      <div className="flex justify-between items-center mb-3 pb-2 border-b-2 border-neutral-800 text-neutral-300">
-        <div className="flex items-center gap-2">
-          <span className="text-amber-400 text-xs">📼</span>
-          <h2 className="text-[10px] sm:text-xs font-bold tracking-wider text-yellow-300">
-            GAME CARTRIDGES ({games.length})
-          </h2>
-        </div>
+    <div className="relative flex flex-col justify-end select-none font-pixel pointer-events-auto">
+      {/* Title Tag */}
+      <div className="flex items-center justify-between mb-1 text-[7px] text-amber-200/90 px-1 font-bold">
+        <span>CARTRIDGE PILE ({games.length})</span>
         <button
           type="button"
           onClick={onOpenCartridgeSlot}
-          className="text-[8px] text-cyan-400 hover:text-cyan-300 underline cursor-pointer"
+          className="text-cyan-400 hover:text-cyan-300 underline cursor-pointer text-[6px]"
         >
           [FRONT VIEW]
         </button>
       </div>
 
-      {/* Cartridge Stack List */}
-      <div className="flex flex-col gap-2 relative">
-        {games.map((game) => {
+      {/* Cartridge Stack: layered on top of each other */}
+      <div className="flex flex-col -space-y-3 sm:-space-y-4 max-w-xs sm:max-w-sm">
+        {games.map((game, idx) => {
           const isCurrent = activeGame?.id === game.id;
           return (
-            <div key={game.id} className="relative">
-              <CartridgeItem
-                game={game}
-                view="spine"
-                isSelected={isCurrent}
-                onSelect={handleSelect}
-              />
-              {isCurrent && (
-                <span className="absolute -left-2 top-1/2 -translate-y-1/2 text-yellow-400 text-[10px] animate-pulse">
-                  ▶
-                </span>
-              )}
+            <div
+              key={game.id}
+              style={{ zIndex: 10 + idx }}
+              className="relative transition-transform duration-150 hover:-translate-y-2 hover:scale-[1.02]"
+            >
+              <button
+                type="button"
+                onClick={() => handleSelect(game)}
+                title={`Load ${game.title} into NES`}
+                className={`w-52 sm:w-60 h-9 sm:h-10 bg-neutral-600 hover:bg-neutral-500 rounded-xs pixel-border-sm flex items-center px-2 cursor-pointer shadow-[0_8px_12px_rgba(0,0,0,0.8)] text-left select-none active:translate-x-1 ${
+                  isCurrent ? "ring-2 ring-yellow-400 bg-neutral-500" : ""
+                }`}
+              >
+                {/* Left Grip Ridges */}
+                <div className="flex gap-[2px] mr-2 shrink-0">
+                  <div className="w-[2px] h-5 bg-neutral-800" />
+                  <div className="w-[2px] h-5 bg-neutral-800" />
+                  <div className="w-[2px] h-5 bg-neutral-800" />
+                </div>
+
+                {/* Spine Label */}
+                <div
+                  className="flex-1 h-6 flex items-center justify-between px-2 text-[8px] font-bold text-white shadow-inner border border-neutral-900 overflow-hidden"
+                  style={{ backgroundColor: game.labelColor }}
+                >
+                  <div className="flex items-center gap-1 truncate">
+                    <span className="text-[10px]">{game.pixelArtIcon}</span>
+                    <span className="truncate tracking-wide">{game.title}</span>
+                  </div>
+                  {isCurrent && (
+                    <span className="text-[6px] text-yellow-300 ml-1 shrink-0 bg-black/60 px-1 py-0.2">
+                      IN NES
+                    </span>
+                  )}
+                </div>
+
+                {/* Right Grip Ridges */}
+                <div className="flex gap-[2px] ml-2 shrink-0">
+                  <div className="w-[2px] h-5 bg-neutral-800" />
+                  <div className="w-[2px] h-5 bg-neutral-800" />
+                </div>
+              </button>
             </div>
           );
         })}
-      </div>
-
-      {/* Pile Base / Desk Shelf Accent */}
-      <div className="mt-4 pt-2 border-t border-neutral-800 flex justify-between items-center text-[7px] text-neutral-500">
-        <span>CLICK ANY TO INSERT INTO NES</span>
-        <span className="text-yellow-500/80">STACK READY</span>
       </div>
     </div>
   );

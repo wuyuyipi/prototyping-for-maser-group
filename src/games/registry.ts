@@ -5,77 +5,67 @@ import TurboRacerPlaceholder from "./game-3/TurboRacerPlaceholder";
 import PixelPlatformerPlaceholder from "./game-4/PixelPlatformerPlaceholder";
 
 /**
- * =======================================================================
  * RETRO ARCADE GAME REGISTRY
- * =======================================================================
- * TEAMMATES: To register your game:
- * 1. Build your game component in `src/games/<your-game-name>/`
- * 2. Import it here
- * 3. Add an entry to the `GAMES_REGISTRY` array below
- * 
- * Each game will automatically:
- * - Appear as a cartridge in the desk stack
- * - Be available in the front-facing NES cartridge selector
- * - Load inside the retro CRT monitor when inserted!
- * =======================================================================
+ * Each teammate builds their game in their own folder under `src/games/`
+ * and registers their game definition here.
  */
 export const GAMES_REGISTRY: GameDefinition[] = [
   {
-    id: "space-defender",
-    title: "Space Defender",
+    id: "game-1",
+    title: "Game 1 (Slot 1)",
     author: "Teammate 1",
     year: 1985,
-    genre: "Space Shooter",
-    description: "Defend deep space from waves of 8-bit alien invaders.",
-    instructions: "Arrows to navigate, Space to shoot lasers.",
-    labelColor: "#1e3a8a", // Deep retro blue
+    genre: "Retro Action",
+    description: "Reserved space for Teammate 1's retro game.",
+    instructions: "Pending implementation.",
+    labelColor: "#1e3a8a", // Blue cartridge label
     accentColor: "#38bdf8",
-    labelBadge: "NES-SD-USA",
-    pixelArtIcon: "🚀",
+    labelBadge: "NES-01-USA",
+    pixelArtIcon: "🕹️",
     status: "placeholder",
     Component: SpaceDefenderPlaceholder,
   },
   {
-    id: "dungeon-quest",
-    title: "Dungeon Quest",
+    id: "game-2",
+    title: "Game 2 (Slot 2)",
     author: "Teammate 2",
-    year: 1987,
-    genre: "RPG / Adventure",
-    description: "Explore dark labyrinths and conquer ancient dragons.",
-    instructions: "D-pad to move, A to attack, B to use magic.",
-    labelColor: "#78350f", // Earthy dungeon brown/gold
+    year: 1986,
+    genre: "Adventure",
+    description: "Reserved space for Teammate 2's retro game.",
+    instructions: "Pending implementation.",
+    labelColor: "#78350f", // Amber/Gold cartridge label
     accentColor: "#fbbf24",
-    labelBadge: "NES-DQ-USA",
+    labelBadge: "NES-02-USA",
     pixelArtIcon: "🗡️",
     status: "placeholder",
     Component: DungeonQuestPlaceholder,
   },
   {
-    id: "turbo-racer",
-    title: "Turbo Racer '86",
+    id: "game-3",
+    title: "Game 3 (Slot 3)",
     author: "Teammate 3",
-    year: 1986,
+    year: 1987,
     genre: "Arcade Racing",
-    description: "Outspeed traffic and drift across neon highway turns.",
-    instructions: "Left/Right to steer, Up for Nitro boost.",
-    labelColor: "#9a3412", // Retro red-orange
+    description: "Reserved space for Teammate 3's retro game.",
+    instructions: "Pending implementation.",
+    labelColor: "#9a3412", // Orange cartridge label
     accentColor: "#f97316",
-    labelBadge: "NES-TR-USA",
+    labelBadge: "NES-03-USA",
     pixelArtIcon: "🏎️",
     status: "placeholder",
     Component: TurboRacerPlaceholder,
   },
   {
-    id: "pixel-platformer",
-    title: "Pixel Hero",
+    id: "game-4",
+    title: "Game 4 (Slot 4)",
     author: "Teammate 4",
     year: 1988,
     genre: "Platformer",
-    description: "Leap over spikes and stomp obstacles across pixel worlds.",
-    instructions: "Arrows to run, Space to jump, Z to sprint.",
-    labelColor: "#14532d", // Vintage forest green
+    description: "Reserved space for Teammate 4's retro game.",
+    instructions: "Pending implementation.",
+    labelColor: "#14532d", // Forest Green cartridge label
     accentColor: "#4ade80",
-    labelBadge: "NES-PH-USA",
+    labelBadge: "NES-04-USA",
     pixelArtIcon: "🍄",
     status: "placeholder",
     Component: PixelPlatformerPlaceholder,
@@ -84,8 +74,4 @@ export const GAMES_REGISTRY: GameDefinition[] = [
 
 export function getGameById(id: string): GameDefinition | undefined {
   return GAMES_REGISTRY.find((game) => game.id === id);
-}
-
-export function getDefaultGame(): GameDefinition {
-  return GAMES_REGISTRY[0];
 }

@@ -1,12 +1,14 @@
 "use client";
 
-// Simple Web Audio API sound synthesizer for authentic 8-bit arcade SFX
+// Web Audio API 8-bit sound effects synthesizer
 let audioCtx: AudioContext | null = null;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
   if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
     }
@@ -17,7 +19,9 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-export function playSound(type: "slotOpen" | "insertCartridge" | "powerSwitch" | "blip" | "eject") {
+export function playSound(
+  type: "slotOpen" | "insertCartridge" | "powerSwitch" | "blip" | "eject"
+) {
   try {
     const ctx = getAudioContext();
     if (!ctx) return;
@@ -29,51 +33,51 @@ export function playSound(type: "slotOpen" | "insertCartridge" | "powerSwitch" |
     gain.connect(ctx.destination);
 
     if (type === "slotOpen") {
-      // Mechanical latch click
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(180, now);
-      osc.frequency.exponentialRampToValueAtTime(320, now + 0.08);
+      // Mechanical latch click & spring opening
+      osc.type = "square";
+      osc.frequency.setValueAtTime(240, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.08);
       gain.gain.setValueAtTime(0.2, now);
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
       osc.start(now);
       osc.stop(now + 0.12);
     } else if (type === "insertCartridge") {
-      // Heavy double clack
-      osc.type = "square";
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.setValueAtTime(70, now + 0.05);
-      gain.gain.setValueAtTime(0.25, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-      osc.start(now);
-      osc.stop(now + 0.18);
-    } else if (type === "powerSwitch") {
-      // Crisp 8-bit chime
-      osc.type = "square";
-      osc.frequency.setValueAtTime(440, now);
-      osc.frequency.setValueAtTime(880, now + 0.08);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } else if (type === "blip") {
-      // Cursor beep
-      osc.type = "square";
-      osc.frequency.setValueAtTime(600, now);
-      gain.gain.setValueAtTime(0.1, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } else if (type === "eject") {
-      // Spring pop
+      // Heavy double clack of cartridge being pushed down into NES spring
       osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.setValueAtTime(90, now + 0.06);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
       osc.start(now);
-      osc.stop(now + 0.12);
+      osc.stop(now + 0.16);
+    } else if (type === "powerSwitch") {
+      // Crisp 8-bit power click
+      osc.type = "square";
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.setValueAtTime(260, now + 0.05);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    } else if (type === "blip") {
+      // Short menu cursor beep
+      osc.type = "square";
+      osc.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } else if (type === "eject") {
+      // Cartridge popping up from spring latch
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.09);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
     }
   } catch {
-    // Ignore audio errors if blocked by browser policy
+    // Graceful fallback if Web Audio is muted/blocked
   }
 }

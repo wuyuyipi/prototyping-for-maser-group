@@ -8,12 +8,14 @@ interface CrtMonitorProps {
   activeGame: GameDefinition | null;
   onEjectGame: () => void;
   onOpenCartridgeSlot: () => void;
+  onEarnPoints?: (points: number) => void;
 }
 
 export default function CrtMonitor({
   activeGame,
   onEjectGame,
   onOpenCartridgeSlot,
+  onEarnPoints,
 }: CrtMonitorProps) {
   const [powerOn, setPowerOn] = useState(true);
   const [scanlines, setScanlines] = useState(true);
@@ -67,9 +69,9 @@ export default function CrtMonitor({
             <div className="crt-screen-container relative w-full aspect-[4/3] max-h-[46vh] min-h-[220px] flex items-center justify-center bg-black">
               {powerOn ? (
                 activeGame ? (
-                  /* Active Game Interface: Blank placeholder for whoever builds it */
-                  <div className="w-full h-full relative z-10 crt-flicker bg-black flex flex-col items-center justify-between p-3">
-                    <activeGame.Component onExit={onEjectGame} />
+                  /* Active Game Interface */
+                  <div className="w-full h-full relative z-10 crt-flicker bg-black flex flex-col items-center justify-between">
+                    <activeGame.Component onExit={onEjectGame} onEarnPoints={onEarnPoints} />
                   </div>
                 ) : (
                   /* No Cartridge Inserted: Pure blank screen with subtle power standby glow */

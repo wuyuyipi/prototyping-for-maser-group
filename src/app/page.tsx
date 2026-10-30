@@ -43,6 +43,10 @@ export default function RetroLivingRoomPage() {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
   };
 
+  const handleEarnPoints = (pts: number) => {
+    setPlayerPoints((prev) => prev + pts);
+  };
+
   return (
     <main className="relative h-screen w-screen overflow-hidden select-none bg-neutral-950 flex flex-col justify-between font-pixel">
       {/* ======================================================================
@@ -148,6 +152,7 @@ export default function RetroLivingRoomPage() {
           activeGame={activeGame}
           onEjectGame={handleEjectGame}
           onOpenCartridgeSlot={handleOpenSlot}
+          onEarnPoints={handleEarnPoints}
         />
       </section>
 

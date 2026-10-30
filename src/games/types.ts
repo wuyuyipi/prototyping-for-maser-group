@@ -10,10 +10,10 @@ export interface GameMetadata {
   genre: string;
   description: string;
   instructions: string;
-  cartridgeColor?: string; // Color of cartridge casing (default classic NES grey #6b7280)
+  cartridgeColor?: string; // Color of cartridge casing
   labelColor: string; // Main background color for cartridge label art
   accentColor: string; // Secondary accent color
-  labelBadge: string; // 2-4 letter game code, e.g. "NES-SD-USA"
+  labelBadge: string; // Game code, e.g. "NES-SM-USA"
   pixelArtIcon: string; // Emoji or pixel icon representation for label
   status: GameStatus;
 }
@@ -21,6 +21,7 @@ export interface GameMetadata {
 export interface GameComponentProps {
   onExit?: () => void;
   isMuted?: boolean;
+  onEarnPoints?: (points: number) => void;
 }
 
 export interface GameDefinition extends GameMetadata {

@@ -76,7 +76,7 @@ export default function CartridgeModal({
       </div>
 
       {/* Front-facing Cartridges Showcase */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 justify-items-center py-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 max-w-xl mx-auto gap-6 justify-items-center py-4">
         {games.map((game) => {
           const isSelected = activeGame?.id === game.id;
           return (

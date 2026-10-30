@@ -118,9 +118,6 @@ export default function CartridgeItem({
           <div className="text-[10px] sm:text-[11px] font-bold tracking-wider text-yellow-300 drop-shadow-[0_2px_2px_rgba(0,0,0,1)] truncate">
             {game.pixelArtIcon} {game.title}
           </div>
-          <div className="text-[6px] text-neutral-300 line-clamp-1">
-            BY {game.author.toUpperCase()}
-          </div>
         </div>
       </div>
 

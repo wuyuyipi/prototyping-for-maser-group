@@ -7,7 +7,7 @@ import FruitNinjaGame from "./fruit-ninja/FruitNinjaGame";
  * =======================================================================
  * RETRO ARCADE GAME REGISTRY
  * 1. Pixel Fruit Ninja (Unlocked by default - play to earn points!)
- * 2. Super Pixel Bros. (Requires 300 PTS to unlock)
+ * 2. Justin's Adventure (Requires 300 PTS to unlock)
  * 3. Tetris (Requires 500 PTS to unlock)
  * =======================================================================
  */
@@ -15,13 +15,13 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "fruit-ninja",
     title: "Pixel Fruit Ninja",
-    author: "Mingtai",
+    author: "Retro Arcade",
     year: 1987,
     genre: "Dojo Slasher",
     description:
       "Slash flying pixel watermelons & golden peaches with your katana, rack up combos, and dodge bombs!",
     instructions:
-      "Swipe mouse across the CRT screen (or press Space) to slash fruits. Avoid bombs! R to restart.",
+      "Swipe mouse across the CRT screen to slash fruits. Avoid bombs! R to restart.",
     cartridgeColor: "#14532d",
     labelColor: "#15803d",
     accentColor: "#ef4444",
@@ -35,7 +35,7 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "super-pixel-bros",
     title: "Justin's Adventure",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1985,
     genre: "Platformer",
     description:
@@ -55,7 +55,7 @@ export const GAMES_REGISTRY: GameDefinition[] = [
   {
     id: "tetris",
     title: "Tetris",
-    author: "Arcade Team",
+    author: "Retro Arcade",
     year: 1989,
     genre: "Block Puzzle",
     description:

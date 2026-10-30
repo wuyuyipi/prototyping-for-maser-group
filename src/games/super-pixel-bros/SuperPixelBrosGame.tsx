@@ -749,16 +749,16 @@ export default function SuperPixelBrosGame({
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* Interactive Game Over / Victory Overlay with 360-Spinning Justin Photo */}
+      {/* Interactive Game Over / Victory Overlay with 2x Larger 360-Spinning Justin Photo */}
       {(gameOver || won) && (
         <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 z-20">
           <div
             className={`bg-neutral-950 border-4 ${
               won ? "border-yellow-400" : "border-red-500"
-            } px-3 py-2.5 rounded flex flex-col items-center text-center max-w-[240px] w-full shadow-[0_0_25px_rgba(0,0,0,0.85)] space-y-1.5`}
+            } px-3 py-2 rounded flex flex-col items-center text-center max-w-[270px] w-full shadow-[0_0_25px_rgba(0,0,0,0.85)] space-y-1.5`}
           >
             {won && (
-              <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-3 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.8)] animate-spin">
+              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.9)] animate-spin shrink-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="/images/justin_victory.png"

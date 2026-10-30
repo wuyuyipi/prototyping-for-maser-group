@@ -59,10 +59,18 @@ export default function RetroLivingRoomPage() {
 
   const handlePurchaseGame = (item: ShopItem) => {
     setPlayerPoints((prev) => Math.max(0, prev - item.price));
-    // If purchasing Pixel Fruit Ninja in the shop, unlock it so it appears in the desk pile!
-    if (item.id === "fruit-ninja" || item.title.toLowerCase().includes("fruit")) {
+    // If the purchased item corresponds to a specific registered game, unlock it directly
+    if (games.some((g) => g.id === item.id)) {
+      setUnlockedGameIds((prev) =>
+        prev.includes(item.id) ? prev : [...prev, item.id]
+      );
+    } else if (item.id === "fruit-ninja" || item.title.toLowerCase().includes("fruit")) {
       setUnlockedGameIds((prev) =>
         prev.includes("fruit-ninja") ? prev : [...prev, "fruit-ninja"]
+      );
+    } else if (item.id === "mario-invaders" || item.title.toLowerCase().includes("mario")) {
+      setUnlockedGameIds((prev) =>
+        prev.includes("mario-invaders") ? prev : [...prev, "mario-invaders"]
       );
     } else {
       const nextLocked = games.find((g) => !unlockedGameIds.includes(g.id));
@@ -206,6 +214,7 @@ export default function RetroLivingRoomPage() {
       <ShopModal
         isOpen={isShopModalOpen}
         playerPoints={playerPoints}
+        unlockedGameIds={unlockedGameIds}
         onClose={() => setIsShopModalOpen(false)}
         onPurchaseGame={handlePurchaseGame}
       />

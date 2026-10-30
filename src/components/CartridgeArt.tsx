@@ -94,6 +94,84 @@ export default function CartridgeArt({
     );
   }
 
+  if (gameId === "mario-invaders") {
+    // ✈️ MARIO INVADERS: Sky Patrol, Red Airplane with Mario, Piranha / Koopa / Goomba Invaders, Fireballs
+    return (
+      <div
+        className={`relative w-full ${
+          compact ? "h-14 sm:h-16" : "h-28 sm:h-32"
+        } bg-[#1e1b4b] overflow-hidden border-2 border-[#facc15] flex items-center justify-center select-none`}
+      >
+        <svg
+          viewBox="0 0 80 48"
+          className="w-full h-full relative z-10"
+          shapeRendering="crispEdges"
+        >
+          {/* Sky Gradient / Night Horizon */}
+          <rect x="0" y="0" width="80" height="28" fill="#1e1b4b" />
+          <rect x="0" y="28" width="80" height="20" fill="#312e81" />
+
+          {/* Distant Mountains / Hills */}
+          <polygon points="0,32 18,22 36,32" fill="#16a34a" />
+          <polygon points="28,32 46,20 64,32" fill="#15803d" />
+          <polygon points="52,32 66,24 80,32" fill="#16a34a" />
+
+          {/* Clouds */}
+          <rect x="6" y="8" width="10" height="4" fill="#ffffff" opacity="0.8" />
+          <rect x="64" y="6" width="12" height="4" fill="#ffffff" opacity="0.8" />
+
+          {/* Invader 1: Piranha Plant (top center) */}
+          <g transform="translate(35, 4)">
+            <rect x="2" y="0" width="6" height="4" fill="#ef4444" />
+            <rect x="0" y="2" width="10" height="3" fill="#ef4444" />
+            <rect x="2" y="2" width="2" height="2" fill="#ffffff" />
+            <rect x="6" y="2" width="2" height="2" fill="#ffffff" />
+            <rect x="3" y="5" width="4" height="3" fill="#16a34a" />
+          </g>
+
+          {/* Invader 2: Koopa Troopa (top left) */}
+          <g transform="translate(14, 6)">
+            <rect x="2" y="0" width="4" height="3" fill="#facc15" />
+            <rect x="0" y="3" width="8" height="5" fill="#16a34a" />
+            <rect x="2" y="4" width="4" height="3" fill="#ffffff" />
+          </g>
+
+          {/* Invader 3: Goomba (top right) */}
+          <g transform="translate(56, 8)">
+            <rect x="1" y="0" width="6" height="5" fill="#d97706" />
+            <rect x="0" y="2" width="8" height="4" fill="#b45309" />
+            <rect x="2" y="2" width="1" height="2" fill="#ffffff" />
+            <rect x="5" y="2" width="1" height="2" fill="#ffffff" />
+          </g>
+
+          {/* Fired Fireballs traveling up */}
+          <g transform="translate(38, 16)">
+            <rect x="0" y="0" width="3" height="4" fill="#ef4444" />
+            <rect x="1" y="1" width="1" height="2" fill="#facc15" />
+          </g>
+
+          {/* Player: Mario in Red Airplane (bottom center) */}
+          <g transform="translate(30, 26)">
+            {/* Propeller */}
+            <rect x="8" y="0" width="4" height="2" fill="#facc15" />
+            {/* Fuselage */}
+            <rect x="6" y="2" width="8" height="10" fill="#dc2626" />
+            <rect x="4" y="5" width="12" height="4" fill="#b91c1c" />
+            {/* Wings */}
+            <rect x="0" y="6" width="20" height="3" fill="#ef4444" />
+            <rect x="0" y="5" width="2" height="5" fill="#facc15" />
+            <rect x="18" y="5" width="2" height="5" fill="#facc15" />
+            {/* Cockpit glass */}
+            <rect x="8" y="4" width="4" height="3" fill="#38bdf8" />
+            {/* Mario Head */}
+            <rect x="8" y="2" width="4" height="2" fill="#fed7aa" />
+            <rect x="7" y="1" width="6" height="2" fill="#dc2626" />
+          </g>
+        </svg>
+      </div>
+    );
+  }
+
   if (gameId === "super-pixel-bros") {
     // 🍄 SUPER PIXEL BROS: Blue Sky, Question Block, Brick, Mario, Goomba, Green Pipe & Flagpole
     return (

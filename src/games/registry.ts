@@ -2,13 +2,15 @@ import { GameDefinition } from "./types";
 import SuperPixelBrosGame from "./super-pixel-bros/SuperPixelBrosGame";
 import TetrisGame from "./tetris/TetrisGame";
 import FruitNinjaGame from "./fruit-ninja/FruitNinjaGame";
+import MarioInvadersGame from "./mario-invaders/MarioInvadersGame";
 
 /**
  * =======================================================================
  * RETRO ARCADE GAME REGISTRY
  * 1. Super Pixel Bros. (Unlocked by default)
  * 2. Tetris (Unlocked by default)
- * 3. Pixel Fruit Ninja (Available to buy from the Game Shop for 300 PTS)
+ * 3. Pixel Fruit Ninja (Available in Game Shop for 300 PTS)
+ * 4. Mario Invaders (Available in Game Shop for 300 PTS)
  * =======================================================================
  */
 export const GAMES_REGISTRY: GameDefinition[] = [
@@ -71,6 +73,26 @@ export const GAMES_REGISTRY: GameDefinition[] = [
     price: 300,
     initiallyUnlocked: false,
     Component: FruitNinjaGame,
+  },
+  {
+    id: "mario-invaders",
+    title: "Mario Invaders",
+    author: "Zhongyue",
+    year: 1986,
+    genre: "Space Shooter",
+    description:
+      "Pilot Mario's red fighter plane, blast waves of Goombas, Koopas, and Piranha Plants in 16-bit retro sky patrol!",
+    instructions:
+      "Left/Right or A/D to fly, Space to shoot fireballs (max 3), P to pause, R to restart.",
+    cartridgeColor: "#7f1d1d",
+    labelColor: "#b91c1c",
+    accentColor: "#facc15",
+    labelBadge: "NES-MI-USA",
+    pixelArtIcon: "✈️",
+    status: "ready",
+    price: 300,
+    initiallyUnlocked: false,
+    Component: MarioInvadersGame,
   },
 ];
 

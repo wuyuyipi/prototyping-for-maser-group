@@ -15,6 +15,7 @@ import AvatarSelectModal from "./AvatarSelectModal";
 interface ShopModalProps {
   isOpen: boolean;
   playerPoints: number;
+  unlockedGameIds?: string[];
   onClose: () => void;
   onPurchaseGame?: (item: ShopItem) => void;
 }
@@ -22,13 +23,26 @@ interface ShopModalProps {
 export default function ShopModal({
   isOpen,
   playerPoints,
+  unlockedGameIds = [],
   onClose,
   onPurchaseGame,
 }: ShopModalProps) {
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  // Shop items state (tracks which are unlocked)
-  const [shopItems, setShopItems] = useState<ShopItem[]>(INITIAL_SHOP_ITEMS);
+  // Locally purchased item IDs in addition to unlockedGameIds
+  const [purchasedItemIds, setPurchasedItemIds] = useState<string[]>([]);
+
+  // Shop items with dynamic isUnlocked status
+  const shopItems: ShopItem[] = React.useMemo(() => {
+    return INITIAL_SHOP_ITEMS.map((item) => ({
+      ...item,
+      isUnlocked: Boolean(
+        item.isUnlocked ||
+        unlockedGameIds.includes(item.id) ||
+        purchasedItemIds.includes(item.id)
+      ),
+    }));
+  }, [unlockedGameIds, purchasedItemIds]);
 
   // Avatar Selection state (defaults to Spike the Dino Kaiju)
   const [selectedAvatarId, setSelectedAvatarId] = useState<string>("dino");
@@ -65,13 +79,16 @@ export default function ShopModal({
   // Current tile data
   const currentTile: BoardTile = BOARD_TILES[currentTileIndex] || BOARD_TILES[0];
 
-  // Map stores to their landmark tiles
-  const landmarkStoreMap: Record<number, ShopItem> = {
-    5: (shopItems.find((i) => i.id === "fruit-ninja") || shopItems.find((i) => i.id === "shop-game-1"))!,
-    11: shopItems.find((i) => i.id === "shop-game-2")!,
-    21: shopItems.find((i) => i.id === "shop-game-3")!,
-    26: shopItems.find((i) => i.id === "shop-game-4")!,
-  };
+  // Map stores to their landmark tiles dynamically
+  const landmarkStoreMap = React.useMemo(() => {
+    const map: Record<number, ShopItem> = {};
+    for (const item of shopItems) {
+      if (item.landmarkTileIndex !== undefined) {
+        map[item.landmarkTileIndex] = item;
+      }
+    }
+    return map;
+  }, [shopItems]);
 
   // Close handler
   const handleClose = () => {
@@ -152,8 +169,8 @@ export default function ShopModal({
   // Buy game from store
   const handleBuyGame = (item: ShopItem) => {
     playSound("coin");
-    setShopItems((prev) =>
-      prev.map((i) => (i.id === item.id ? { ...i, isUnlocked: true } : i))
+    setPurchasedItemIds((prev) =>
+      prev.includes(item.id) ? prev : [...prev, item.id]
     );
     onPurchaseGame?.(item);
   };

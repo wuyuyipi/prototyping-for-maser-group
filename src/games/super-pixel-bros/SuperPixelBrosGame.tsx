@@ -749,8 +749,8 @@ export default function SuperPixelBrosGame({
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* Small "JUSTIN'S ADVENTURE" Title Badge in Top-Left of TV Screen */}
-      <div className="absolute top-2.5 left-4 z-10 text-[7px] sm:text-[8px] text-yellow-300 bg-black/75 border border-yellow-400/60 px-2 py-0.5 rounded pointer-events-none tracking-wider shadow-sm">
+      {/* Small "JUSTIN'S ADVENTURE" Title Badge in Visible Upper-Left of TV Screen */}
+      <div className="absolute top-[22%] left-5 z-10 text-[7px] sm:text-[8px] text-yellow-300 bg-black/85 border border-yellow-400/70 px-2 py-0.5 rounded pointer-events-none tracking-wider shadow-sm">
         JUSTIN&apos;S ADVENTURE
       </div>
 

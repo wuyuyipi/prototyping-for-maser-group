@@ -605,74 +605,49 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
         ctx.fillRect(x, 24, 2, CANVAS_H - 24);
       }
 
-      // 2. Top Arcade HUD Bar with 5 Hearts in Top-Left & Score in Top-Right
-      ctx.fillStyle = s.hudFlashTimer > 0 ? "#064e3b" : "#090d16";
-      ctx.fillRect(0, 0, CANVAS_W, 22);
+      // 2. Top Arcade HUD Bar (positioned at y = 40..64 so it sits cleanly inside the CRT visible viewport)
+      ctx.fillStyle = s.hudFlashTimer > 0 ? "#064e3b" : "rgba(9, 13, 22, 0.88)";
+      ctx.fillRect(0, 0, CANVAS_W, 64);
       ctx.fillStyle = s.hudFlashTimer > 0 ? "#34d399" : "#eab308";
-      ctx.fillRect(0, 21, CANVAS_W, 2);
+      ctx.fillRect(0, 63, CANVAS_W, 2);
       if (s.hudFlashTimer > 0) s.hudFlashTimer--;
-
-      // 5 Pixel Hearts in Top-Left Corner (lose 1 heart per missed fruit)
-      const heartsRemaining = Math.max(0, MAX_MISSED - s.missed);
-      for (let i = 0; i < MAX_MISSED; i++) {
-        const hx = 14 + i * 14;
-        const hy = 6;
-        const alive = i < heartsRemaining;
-        // White outline so hearts pop against dark background
-        ctx.fillStyle = alive ? "#ffffff" : "#1f2937";
-        ctx.fillRect(hx - 1, hy - 1, 12, 11);
-        ctx.fillStyle = alive ? "#ef4444" : "#374151";
-        // Top lobes of pixel heart
-        ctx.fillRect(hx + 1, hy, 3, 2);
-        ctx.fillRect(hx + 6, hy, 3, 2);
-        // Middle body
-        ctx.fillRect(hx, hy + 2, 10, 3);
-        // Lower taper
-        ctx.fillRect(hx + 1, hy + 5, 8, 2);
-        ctx.fillRect(hx + 2, hy + 7, 6, 1);
-        ctx.fillRect(hx + 4, hy + 8, 2, 1);
-        if (alive) {
-          ctx.fillStyle = "#fecaca";
-          ctx.fillRect(hx + 1, hy + 1, 2, 2);
-        }
-      }
 
       ctx.font = "7px 'Press Start 2P', monospace";
       ctx.fillStyle = s.hudFlashTimer > 0 ? "#ffffff" : "#4ade80";
-      ctx.fillText(`+${s.earnedPts}PTS`, 92, 14);
+      ctx.fillText(`+${s.earnedPts}PTS`, 104, 56);
 
       ctx.fillStyle = "#facc15";
-      ctx.fillText(`SCORE:${s.score}`, 168, 14);
+      ctx.fillText(`SCORE:${s.score}`, 172, 56);
 
       // 3. Game State Logic
       if (s.phase === "title") {
-        ctx.fillStyle = "rgba(0, 0, 0, 0.72)";
-        ctx.fillRect(16, 36, CANVAS_W - 32, 156);
+        ctx.fillStyle = "rgba(0, 0, 0, 0.76)";
+        ctx.fillRect(16, 68, CANVAS_W - 32, 112);
         ctx.strokeStyle = "#facc15";
         ctx.lineWidth = 2;
-        ctx.strokeRect(16, 36, CANVAS_W - 32, 156);
+        ctx.strokeRect(16, 68, CANVAS_W - 32, 112);
 
-        drawPixelFruit(ctx, CANVAS_W / 2 - 40, 66, FRUIT_TYPES[0]);
-        drawPixelFruit(ctx, CANVAS_W / 2, 66, FRUIT_TYPES[5]);
-        drawPixelFruit(ctx, CANVAS_W / 2 + 40, 66, BOMB_TYPE);
+        drawPixelFruit(ctx, CANVAS_W / 2 - 40, 88, FRUIT_TYPES[0]);
+        drawPixelFruit(ctx, CANVAS_W / 2, 88, FRUIT_TYPES[5]);
+        drawPixelFruit(ctx, CANVAS_W / 2 + 40, 88, BOMB_TYPE);
 
         ctx.fillStyle = "#4ade80";
-        ctx.font = "11px 'Press Start 2P', monospace";
-        ctx.fillText("PIXEL NINJA", 66, 102);
+        ctx.font = "10px 'Press Start 2P', monospace";
+        ctx.fillText("PIXEL NINJA", 72, 116);
 
         ctx.fillStyle = "#f97316";
-        ctx.font = "7px 'Press Start 2P', monospace";
-        ctx.fillText("FRUIT SLASHER", 82, 116);
+        ctx.font = "6px 'Press Start 2P', monospace";
+        ctx.fillText("FRUIT SLASHER", 88, 128);
 
         ctx.fillStyle = "#e5e7eb";
         ctx.font = "6px 'Press Start 2P', monospace";
-        ctx.fillText("SWIPE MOUSE TO SLICE!", 64, 138);
-        ctx.fillText("AVOID BOMBS! 5 HEARTS", 62, 152);
+        ctx.fillText("SWIPE MOUSE TO SLICE!", 64, 144);
+        ctx.fillText("AVOID BOMBS! 5 HEARTS", 62, 156);
 
         if (Math.floor(Date.now() / 400) % 2 === 0) {
           ctx.fillStyle = "#facc15";
-          ctx.font = "7px 'Press Start 2P', monospace";
-          ctx.fillText("CLICK SCREEN TO START", 52, 176);
+          ctx.font = "6px 'Press Start 2P', monospace";
+          ctx.fillText("CLICK SCREEN TO START", 62, 172);
         }
       } else if (s.phase === "playing") {
         s.elapsedFrames++;
@@ -698,7 +673,7 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
               playSound("tetrisClear");
               s.texts.push({
                 x: Math.max(12, CANVAS_W / 2 - 64),
-                y: 62,
+                y: 82,
                 text: `🔥COMBO x${s.comboCount}! +${bonus}PTS`,
                 color: "#facc15",
                 life: 48,
@@ -732,7 +707,7 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
               playSound("blockHit");
               s.texts.push({
                 x: Math.max(16, Math.min(CANVAS_W - 48, f.x - 12)),
-                y: CANVAS_H - 14,
+                y: 168,
                 text: "-1 ♥",
                 color: "#ef4444",
                 life: 32,
@@ -870,8 +845,8 @@ export default function FruitNinjaGame({ onEarnPoints }: GameComponentProps) {
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* High-Visibility 5 Hearts Overlay in Top-Left of TV Screen */}
-      <div className="absolute top-3 left-4 z-10 flex items-center gap-1.5 bg-neutral-950/90 border-2 border-red-500 px-2.5 py-1 rounded shadow-[0_0_12px_rgba(239,68,68,0.75)] pointer-events-none">
+      {/* High-Visibility 5 Hearts Overlay Moved Down into Visible Upper-Left of TV Screen */}
+      <div className="absolute top-[24%] left-5 z-10 flex items-center gap-1.5 bg-neutral-950/95 border-2 border-red-500 px-2.5 py-1 rounded shadow-[0_0_12px_rgba(239,68,68,0.85)] pointer-events-none">
         {Array.from({ length: MAX_MISSED }).map((_, idx) => {
           const alive = idx < heartsLeft;
           return (

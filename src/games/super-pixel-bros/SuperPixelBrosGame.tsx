@@ -207,7 +207,7 @@ export default function SuperPixelBrosGame({
       if (["ArrowUp", "KeyW", "Space"].includes(e.code)) {
         e.preventDefault();
         if (!gameStateRef.current.keys.jump && gameStateRef.current.player.grounded) {
-          gameStateRef.current.player.vy = -7.2;
+          gameStateRef.current.player.vy = -6.8;
           gameStateRef.current.player.grounded = false;
           playSound("jump");
         }
@@ -266,20 +266,20 @@ export default function SuperPixelBrosGame({
       const state = gameStateRef.current;
       const { player, keys, enemies, blocks, flagpoleX } = state;
 
-      const speed = 2.8;
+      const speed = 2.2;
       if (player.alive && !won && !gameOver) {
         if (keys.left) {
           player.vx = -speed;
           player.facingRight = false;
-          player.animFrame += 0.28;
+          player.animFrame += 0.22;
         } else if (keys.right) {
           player.vx = speed;
           player.facingRight = true;
-          player.animFrame += 0.28;
+          player.animFrame += 0.22;
         } else {
           // Sharp ground braking (stops slide after landing)
           if (player.grounded) {
-            player.vx *= 0.2;
+            player.vx *= 0.25;
             if (Math.abs(player.vx) < 0.2) player.vx = 0;
           } else {
             player.vx *= 0.75;
@@ -287,13 +287,13 @@ export default function SuperPixelBrosGame({
           }
         }
 
-        // Heavy, tight platformer gravity (no floatiness)
+        // Balanced, natural platformer gravity (comfortable, controlled arc)
         if (player.vy < 0) {
-          player.vy += keys.jump ? 0.52 : 0.95;
+          player.vy += keys.jump ? 0.44 : 0.70;
         } else {
-          player.vy += 0.72;
+          player.vy += 0.54;
         }
-        if (player.vy > 8.5) player.vy = 8.5;
+        if (player.vy > 7.2) player.vy = 7.2;
 
         const prevY = player.y;
         player.x += player.vx;
@@ -448,7 +448,7 @@ export default function SuperPixelBrosGame({
             // Stomp on top!
             if (player.vy > 0 && prevY + player.height <= enemy.y + 10) {
               enemy.alive = false;
-              player.vy = -5.8;
+              player.vy = -5.2;
               playSound("stomp");
               playSound("coin");
               const pts = 300;

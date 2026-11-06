@@ -266,16 +266,16 @@ export default function SuperPixelBrosGame({
       const state = gameStateRef.current;
       const { player, keys, enemies, blocks, flagpoleX } = state;
 
-      const speed = 1.65;
+      const speed = 1.24;
       if (player.alive && !won && !gameOver) {
         if (keys.left) {
           player.vx = -speed;
           player.facingRight = false;
-          player.animFrame += 0.165;
+          player.animFrame += 0.124;
         } else if (keys.right) {
           player.vx = speed;
           player.facingRight = true;
-          player.animFrame += 0.165;
+          player.animFrame += 0.124;
         } else {
           // Sharp ground braking (stops slide after landing)
           if (player.grounded) {

@@ -754,7 +754,7 @@ export default function SuperPixelBrosGame({
         JUSTIN&apos;S ADVENTURE
       </div>
 
-      {/* Interactive Game Over / Victory Overlay with 2x Larger 360-Spinning Justin Photo */}
+      {/* Interactive Game Over / Victory Overlay */}
       {(gameOver || won) && (
         <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center p-2 z-20">
           <div
@@ -762,17 +762,6 @@ export default function SuperPixelBrosGame({
               won ? "border-yellow-400" : "border-red-500"
             } px-3 py-2 rounded flex flex-col items-center text-center max-w-[270px] w-full shadow-[0_0_25px_rgba(0,0,0,0.85)] space-y-1.5`}
           >
-            {won && (
-              <div className="relative w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-yellow-400 shadow-[0_0_25px_rgba(250,204,21,0.9)] animate-spin shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/justin_victory.png"
-                  alt="Success Justin"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
-
             <div
               className={`text-[11px] sm:text-xs font-bold tracking-wider ${
                 won ? "text-yellow-300" : "text-red-500"

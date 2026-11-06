@@ -63,14 +63,7 @@ export const BOARD_TILES: BoardTile[] = [
   { index: 23, x: 715, y: 320, color: TILE_COLORS[4] },
   { index: 24, x: 690, y: 250, color: TILE_COLORS[5] },
   { index: 25, x: 705, y: 180, color: TILE_COLORS[0] },
-  {
-    index: 26,
-    x: 765,
-    y: 120,
-    color: "#f97316",
-    label: "PINBALL",
-    storeId: "shop-game-4",
-  },
+  { index: 26, x: 765, y: 120, color: TILE_COLORS[1] },
   { index: 27, x: 840, y: 105, color: TILE_COLORS[2] },
   { index: 28, x: 905, y: 150, color: TILE_COLORS[3] },
   {

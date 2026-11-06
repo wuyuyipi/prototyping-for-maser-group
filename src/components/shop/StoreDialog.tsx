@@ -71,8 +71,7 @@ export default function StoreDialog({
     item.id === "fruit-ninja" ||
     item.id === "mario-invaders" ||
     item.id === "super-pixel-bros" ||
-    item.id === "tetris" ||
-    item.id === "pixel-pinball-88";
+    item.id === "tetris";
 
   return (
     <div

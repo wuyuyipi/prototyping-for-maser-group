@@ -62,22 +62,4 @@ export const INITIAL_SHOP_ITEMS: ShopItem[] = [
     accentColor: "#f59e0b",
     landmarkTileIndex: 21,
   },
-  {
-    id: "pixel-pinball-88",
-    title: "Pixel Pinball 88",
-    genre: "Arcade Tables",
-    description: "Multiball madness on 3 retro pixelated pinball tables.",
-    price: 1200,
-    author: "Retro Arcade",
-    labelColor: "#ea580c",
-    labelBadge: "NES-PP-USA",
-    isUnlocked: false,
-    storeName: "Pixel Pinball 88",
-    storeSubtitle: "Arcade Tables",
-    clerkName: "Flipper Frankie",
-    clerkGreeting:
-      "Three tables, multiball frenzy, and pure 1988 retro arcade bliss!",
-    accentColor: "#f97316",
-    landmarkTileIndex: 26,
-  },
 ];

@@ -363,8 +363,8 @@ export default function ShopModal({
             </text>
           </g>
 
-          {/* 2. GAME Stop Platforms on the road (Tiles 5, 11, 21, 26) */}
-          {[5, 11, 21, 26].map((tileIdx) => {
+          {/* 2. GAME Stop Platforms on the road (Tiles 5, 11, 21) */}
+          {[5, 11, 21].map((tileIdx) => {
             const tile = BOARD_TILES[tileIdx];
             const game = landmarkStoreMap[tileIdx];
             if (!tile || !game) return null;
@@ -491,17 +491,6 @@ export default function ShopModal({
               y={455}
               isPlayerHere={currentTileIndex === 21}
               onSelect={() => moveToTile(21)}
-            />
-          </div>
-
-          {/* Game 4: Pixel Pinball 88 (Tile 26, Stop Pad at x:765, y:120) */}
-          <div className="pointer-events-auto">
-            <ShopLandmark
-              item={landmarkStoreMap[26]}
-              x={730}
-              y={80}
-              isPlayerHere={currentTileIndex === 26}
-              onSelect={() => moveToTile(26)}
             />
           </div>
 

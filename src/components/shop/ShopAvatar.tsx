@@ -35,7 +35,7 @@ export default function ShopAvatar({
         left: `${leftPercent}%`,
         top: `${topPercent}%`,
         transform: "translate(-50%, -85%)",
-        transition: "left 260ms ease-out, top 260ms ease-out",
+        transition: "left 180ms ease-out, top 180ms ease-out",
       }}
     >
       {/* Nameplate */}

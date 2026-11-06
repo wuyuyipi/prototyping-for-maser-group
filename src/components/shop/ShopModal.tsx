@@ -50,6 +50,7 @@ export default function ShopModal({
 
   // Board Pawn state
   const [currentTileIndex, setCurrentTileIndex] = useState<number>(0);
+  const currentTileIndexRef = useRef<number>(0);
   const [isMoving, setIsMoving] = useState<boolean>(false);
   const [facingLeft, setFacingLeft] = useState<boolean>(false);
 
@@ -57,8 +58,21 @@ export default function ShopModal({
   const [inspectingItem, setInspectingItem] = useState<ShopItem | null>(null);
   const [isExitDialogOpen, setIsExitDialogOpen] = useState<boolean>(false);
 
-  // Active movement timer ref
+  // Active movement timer refs
   const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const openTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Helper to stop all timers
+  const stopAllTimers = useCallback(() => {
+    if (moveIntervalRef.current) {
+      clearInterval(moveIntervalRef.current);
+      moveIntervalRef.current = null;
+    }
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = null;
+    }
+  }, []);
 
   // Current avatar definition
   const activeAvatar =
@@ -93,10 +107,7 @@ export default function ShopModal({
   // Close handler
   const handleClose = () => {
     playSound("blip");
-    if (moveIntervalRef.current) {
-      clearInterval(moveIntervalRef.current);
-      moveIntervalRef.current = null;
-    }
+    stopAllTimers();
     setIsMoving(false);
     setInspectingItem(null);
     setIsExitDialogOpen(false);
@@ -104,85 +115,90 @@ export default function ShopModal({
     onClose();
   };
 
+  // Cleanup movement timers on unmount
+  useEffect(() => {
+    return () => {
+      stopAllTimers();
+    };
+  }, [stopAllTimers]);
+
+  // Stop indices along the path: only Start, the 4 games, and Exit
+  const GAME_STOP_INDICES = [0, 5, 11, 21, 26, 29];
+
   // Move avatar to a specific target tile step-by-step along the path
   const moveToTile = useCallback(
     (targetIndex: number) => {
       const clampedTarget = Math.max(0, Math.min(BOARD_TILES.length - 1, targetIndex));
+      const startIdx = currentTileIndexRef.current;
 
-      // Clear any in-flight stepping interval so new click immediately redirects
-      if (moveIntervalRef.current) {
-        clearInterval(moveIntervalRef.current);
-        moveIntervalRef.current = null;
+      // Clear any running interval immediately
+      stopAllTimers();
+
+      // If user clicks on the tile they are ALREADY on:
+      // Clicking the spot again explicitly re-opens the game purchasing page!
+      if (clampedTarget === startIdx) {
+        setIsMoving(false);
+        if (landmarkStoreMap[clampedTarget]) {
+          setInspectingItem(landmarkStoreMap[clampedTarget]);
+        } else if (clampedTarget === BOARD_TILES.length - 1) {
+          setIsExitDialogOpen(true);
+        }
+        return;
       }
 
-      setCurrentTileIndex((currentIdx) => {
-        if (clampedTarget === currentIdx) {
+      // Start stepping toward the target
+      setIsMoving(true);
+      setFacingLeft(clampedTarget < startIdx);
+
+      const stepDirection = clampedTarget > startIdx ? 1 : -1;
+      let currentStep = startIdx;
+
+      moveIntervalRef.current = setInterval(() => {
+        currentStep += stepDirection;
+
+        const hasReachedTarget =
+          stepDirection > 0
+            ? currentStep >= clampedTarget
+            : currentStep <= clampedTarget;
+
+        if (hasReachedTarget) {
+          // STOP IMMEDIATELY ON THE DESTINATION GAME SPOT!
+          stopAllTimers();
+          currentTileIndexRef.current = clampedTarget;
+          setCurrentTileIndex(clampedTarget);
           setIsMoving(false);
+          playSound("blip");
+
+          // Open the game purchasing page ONCE upon arrival
           if (landmarkStoreMap[clampedTarget]) {
             setInspectingItem(landmarkStoreMap[clampedTarget]);
           } else if (clampedTarget === BOARD_TILES.length - 1) {
             setIsExitDialogOpen(true);
           }
-          return currentIdx;
-        }
-
-        setIsMoving(true);
-        setFacingLeft(clampedTarget < currentIdx);
-
-        const stepDirection = clampedTarget > currentIdx ? 1 : -1;
-        let nextIndex = currentIdx;
-
-        // Normal, natural walking pace (260ms per spot)
-        moveIntervalRef.current = setInterval(() => {
-          nextIndex += stepDirection;
-          setCurrentTileIndex(nextIndex);
+        } else {
+          currentTileIndexRef.current = currentStep;
+          setCurrentTileIndex(currentStep);
           playSound("blip");
-
-          if (nextIndex === clampedTarget) {
-            if (moveIntervalRef.current) {
-              clearInterval(moveIntervalRef.current);
-              moveIntervalRef.current = null;
-            }
-            setIsMoving(false);
-
-            if (landmarkStoreMap[clampedTarget]) {
-              setTimeout(() => {
-                setInspectingItem(landmarkStoreMap[clampedTarget]);
-              }, 220);
-            } else if (clampedTarget === BOARD_TILES.length - 1) {
-              setTimeout(() => {
-                setIsExitDialogOpen(true);
-              }, 220);
-            }
-          }
-        }, 260);
-
-        return currentIdx;
-      });
+        }
+      }, 160);
     },
-    [landmarkStoreMap]
+    [landmarkStoreMap, stopAllTimers]
   );
 
-  // Cleanup movement interval on unmount
-  useEffect(() => {
-    return () => {
-      if (moveIntervalRef.current) {
-        clearInterval(moveIntervalRef.current);
-      }
-    };
-  }, []);
-
-  // Step Forward 1 Spot
+  // Step Forward to next game stop
   const handleStepForward = () => {
-    if (currentTileIndex < BOARD_TILES.length - 1) {
-      moveToTile(currentTileIndex + 1);
+    const nextStop = GAME_STOP_INDICES.find((idx) => idx > currentTileIndex);
+    if (nextStop !== undefined) {
+      moveToTile(nextStop);
     }
   };
 
-  // Step Backward 1 Spot
+  // Step Backward to previous game stop
   const handleStepBackward = () => {
-    if (currentTileIndex > 0) {
-      moveToTile(currentTileIndex - 1);
+    const prevStops = GAME_STOP_INDICES.filter((idx) => idx < currentTileIndex);
+    if (prevStops.length > 0) {
+      const prevStop = prevStops[prevStops.length - 1];
+      moveToTile(prevStop);
     }
   };
 
@@ -202,6 +218,8 @@ export default function ShopModal({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (inspectingItem || isExitDialogOpen || isAvatarModalOpen) {
         if (e.key === "Escape") {
+          e.preventDefault();
+          e.stopPropagation();
           setInspectingItem(null);
           setIsExitDialogOpen(false);
           setIsAvatarModalOpen(false);
@@ -241,10 +259,20 @@ export default function ShopModal({
   const unlockedCount = shopItems.filter((i) => i.isUnlocked).length;
   const currentStore = landmarkStoreMap[currentTileIndex];
 
+  const handleDialogCancel = (e: React.SyntheticEvent) => {
+    if (inspectingItem || isExitDialogOpen || isAvatarModalOpen) {
+      e.preventDefault();
+      setInspectingItem(null);
+      setIsExitDialogOpen(false);
+      setIsAvatarModalOpen(false);
+    }
+  };
+
   return (
     <dialog
       ref={dialogRef}
       onClose={handleClose}
+      onCancel={handleDialogCancel}
       aria-labelledby="shop-board-title"
       className="bg-[#09070f] text-neutral-100 p-0 rounded-2xl max-w-6xl w-[96vw] max-h-[92vh] overflow-hidden shadow-2xl m-auto backdrop:bg-black/90 font-pixel select-none outline-none border-0"
     >
@@ -296,156 +324,182 @@ export default function ShopModal({
             className="opacity-75"
           />
 
-          {/* Stepping Spots: Pure colorful stones with zero numbers or text, ending at EXIT */}
-          {BOARD_TILES.map((tile) => {
-            const isCurrent = tile.index === currentTileIndex;
+          {/* ====================================================================
+              ROAD STOPS (Only START, the 4 Games, and EXIT)
+              All small colored filler stones are removed!
+              ==================================================================== */}
+
+          {/* 1. START Platform (Tile 0) */}
+          <g
+            className="cursor-pointer pointer-events-auto group"
+            onClick={() => moveToTile(0)}
+          >
+            <circle cx={75} cy={510} r={28} fill="transparent" />
+            <circle
+              cx={75}
+              cy={510}
+              r={22}
+              fill="#064e3b"
+              stroke={currentTileIndex === 0 ? "#fde047" : "#10b981"}
+              strokeWidth={currentTileIndex === 0 ? "3" : "2"}
+              className={`transition-all ${
+                currentTileIndex === 0
+                  ? "filter drop-shadow-[0_0_12px_rgba(253,224,71,0.9)]"
+                  : "group-hover:stroke-emerald-300"
+              }`}
+            />
+            <circle cx={75} cy={510} r={16} fill="#022c22" stroke="#34d399" strokeWidth="1" />
+            <text
+              x={75}
+              y={513}
+              textAnchor="middle"
+              fill="#6ee7b7"
+              fontSize="7"
+              fontWeight="bold"
+              fontFamily="monospace"
+              letterSpacing="0.5"
+            >
+              START
+            </text>
+          </g>
+
+          {/* 2. GAME Stop Platforms on the road (Tiles 5, 11, 21, 26) */}
+          {[5, 11, 21, 26].map((tileIdx) => {
+            const tile = BOARD_TILES[tileIdx];
+            const game = landmarkStoreMap[tileIdx];
+            if (!tile || !game) return null;
+            const isCurrent = currentTileIndex === tileIdx;
             return (
               <g
-                key={tile.index}
+                key={tileIdx}
                 className="cursor-pointer pointer-events-auto group"
-                onClick={() => moveToTile(tile.index)}
+                onClick={() => moveToTile(tileIdx)}
               >
-                {/* Large Invisible Hit Target for effortless clicking */}
-                <rect
-                  x={tile.x - 26}
-                  y={tile.y - 18}
-                  width="52"
-                  height="36"
-                  fill="transparent"
+                {/* Generous Hit Target */}
+                <circle cx={tile.x} cy={tile.y} r={32} fill="transparent" />
+
+                {/* Road Stop Pad */}
+                <circle
+                  cx={tile.x}
+                  cy={tile.y}
+                  r={24}
+                  fill="#0c0915"
+                  stroke={isCurrent ? "#fde047" : game.accentColor}
+                  strokeWidth={isCurrent ? "3" : "2"}
+                  className={`transition-all ${
+                    isCurrent
+                      ? "filter drop-shadow-[0_0_14px_rgba(253,224,71,0.95)]"
+                      : "group-hover:stroke-yellow-300"
+                  }`}
                 />
-
-                {tile.isExit ? (
-                  /* Authentic End-of-Path EXIT Tile */
-                  <g>
-                    {/* Outer Green Border Box */}
-                    <rect
-                      x={tile.x - 26}
-                      y={tile.y - 15}
-                      width="52"
-                      height="30"
-                      rx="6"
-                      fill="#064e3b"
-                      stroke={isCurrent ? "#fde047" : "#10b981"}
-                      strokeWidth={isCurrent ? "2.5" : "2"}
-                      className={
-                        isCurrent
-                          ? "filter drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]"
-                          : "group-hover:stroke-emerald-400"
-                      }
-                    />
-                    {/* Inner Green Border Box */}
-                    <rect
-                      x={tile.x - 20}
-                      y={tile.y - 10}
-                      width="40"
-                      height="20"
-                      rx="4"
-                      fill="#022c22"
-                      stroke="#34d399"
-                      strokeWidth="1.5"
-                    />
-                    {/* EXIT Text */}
-                    <text
-                      x={tile.x}
-                      y={tile.y + 4}
-                      textAnchor="middle"
-                      fill="#6ee7b7"
-                      fontSize="9"
-                      fontWeight="bold"
-                      fontFamily="monospace"
-                      letterSpacing="1"
-                    >
-                      EXIT
-                    </text>
-                  </g>
-                ) : (
-                  <>
-                    {/* Tile Drop Shadow (Firmly grounded) */}
-                    <rect
-                      x={tile.x - 17}
-                      y={tile.y - 12 + 3}
-                      width="34"
-                      height="24"
-                      rx="4"
-                      fill="#000000"
-                      opacity="0.5"
-                    />
-
-                    {/* Tile Body (Stationary, subtle highlight on hover) */}
-                    <rect
-                      x={tile.x - 17}
-                      y={tile.y - 12}
-                      width="34"
-                      height="24"
-                      rx="4"
-                      fill={tile.color}
-                      stroke={isCurrent ? "#fde047" : "#0d0916"}
-                      strokeWidth={isCurrent ? "2.5" : "1"}
-                      className={`transition-opacity ${
-                        isCurrent
-                          ? "filter drop-shadow-[0_0_8px_rgba(253,224,71,0.8)]"
-                          : "group-hover:opacity-90"
-                      }`}
-                    />
-
-                    {/* Bevel Highlight */}
-                    <rect
-                      x={tile.x - 15}
-                      y={tile.y - 10}
-                      width="30"
-                      height="4"
-                      rx="2"
-                      fill="#ffffff"
-                      opacity="0.3"
-                    />
-                  </>
-                )}
+                <circle
+                  cx={tile.x}
+                  cy={tile.y}
+                  r={16}
+                  fill={`${game.accentColor}25`}
+                  stroke={game.accentColor}
+                  strokeWidth="1"
+                  strokeDasharray="3 3"
+                />
+                <circle
+                  cx={tile.x}
+                  cy={tile.y}
+                  r={5}
+                  fill={isCurrent ? "#fde047" : game.accentColor}
+                />
               </g>
             );
           })}
+
+          {/* 3. EXIT Stop Platform (Tile 29) */}
+          <g
+            className="cursor-pointer pointer-events-auto group"
+            onClick={() => moveToTile(29)}
+          >
+            <rect x={895} y={210} width={60} height={40} fill="transparent" />
+            <rect
+              x={899}
+              y={215}
+              width={52}
+              height={30}
+              rx={6}
+              fill="#064e3b"
+              stroke={currentTileIndex === 29 ? "#fde047" : "#10b981"}
+              strokeWidth={currentTileIndex === 29 ? "2.5" : "2"}
+              className={
+                currentTileIndex === 29
+                  ? "filter drop-shadow-[0_0_10px_rgba(253,224,71,0.9)]"
+                  : "group-hover:stroke-emerald-400"
+              }
+            />
+            <rect
+              x={905}
+              y={220}
+              width={40}
+              height={20}
+              rx={4}
+              fill="#022c22"
+              stroke="#34d399"
+              strokeWidth="1.5"
+            />
+            <text
+              x={925}
+              y={234}
+              textAnchor="middle"
+              fill="#6ee7b7"
+              fontSize="9"
+              fontWeight="bold"
+              fontFamily="monospace"
+              letterSpacing="1"
+            >
+              EXIT
+            </text>
+          </g>
         </svg>
 
-        {/* HTML Landmark Stores & Avatar Layer */}
+        {/* ====================================================================
+            GAME STOPS WITH PREVIEW ON THE PATH & AVATAR LAYER
+            ==================================================================== */}
         <div className="absolute inset-0 w-full h-full pointer-events-none">
-          {/* Store 1: Super Pixel Bros. (Tile 5) */}
+          {/* Game 1: Pixel Fruit Ninja (Tile 5, Stop Pad at x:135, y:205) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[5]}
-              x={75}
-              y={135}
+              x={95}
+              y={155}
               isPlayerHere={currentTileIndex === 5}
               onSelect={() => moveToTile(5)}
             />
           </div>
 
-          {/* Store 2: Tetris (Tile 11) */}
+          {/* Game 2: Mario Invaders (Tile 11, Stop Pad at x:495, y:155) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[11]}
-              x={585}
-              y={95}
+              x={495}
+              y={85}
               isPlayerHere={currentTileIndex === 11}
               onSelect={() => moveToTile(11)}
             />
           </div>
 
-          {/* Store 3: Pixel Fruit Ninja (Tile 21) */}
+          {/* Game 3: Super Pixel Bros. (Tile 21, Stop Pad at x:680, y:455) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[21]}
-              x={775}
-              y={460}
+              x={760}
+              y={455}
               isPlayerHere={currentTileIndex === 21}
               onSelect={() => moveToTile(21)}
             />
           </div>
 
-          {/* Store 4: Pixel Pinball 88 (Tile 26) */}
+          {/* Game 4: Pixel Pinball 88 (Tile 26, Stop Pad at x:765, y:120) */}
           <div className="pointer-events-auto">
             <ShopLandmark
               item={landmarkStoreMap[26]}
-              x={765}
-              y={45}
+              x={730}
+              y={80}
               isPlayerHere={currentTileIndex === 26}
               onSelect={() => moveToTile(26)}
             />

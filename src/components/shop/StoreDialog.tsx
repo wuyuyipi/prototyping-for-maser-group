@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { ShopItem } from "./types";
 import { playSound } from "../AudioEffects";
 import CartridgeArt from "../CartridgeArt";
@@ -42,6 +42,19 @@ export default function StoreDialog({
   const canAfford = playerPoints >= item.price;
   const remaining = playerPoints - item.price;
 
+  // Handle ESC key press specifically for this preview modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [onClose]);
+
   const handlePurchase = () => {
     if (item.isUnlocked) return;
     if (!canAfford) {
@@ -62,9 +75,13 @@ export default function StoreDialog({
     item.id === "pixel-pinball-88";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none cursor-pointer"
+    >
       <div
-        className="relative w-full max-w-md bg-neutral-900 border-2 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4"
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md bg-neutral-900 border-2 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4 cursor-default"
         style={{ borderColor: item.accentColor }}
       >
         {/* Game Name Header */}
@@ -74,10 +91,15 @@ export default function StoreDialog({
           </h3>
           <button
             type="button"
-            onClick={onClose}
-            className="px-2 py-1 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-[8px] rounded cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="px-2.5 py-1 bg-neutral-800 hover:bg-red-950 hover:text-red-300 border border-neutral-700 hover:border-red-500 text-neutral-300 text-[8px] font-bold rounded cursor-pointer transition-colors flex items-center gap-1 shadow-sm"
+            title="Close preview (ESC)"
           >
-            [ESC]
+            <span>✕</span>
+            <span>[ESC]</span>
           </button>
         </div>
 
@@ -148,22 +170,18 @@ export default function StoreDialog({
           )}
         </div>
 
-        {/* Buy Action */}
-        <div className="pt-1">
+        {/* Action Buttons: Buy and Back to Map */}
+        <div className="flex gap-2 pt-1">
           {item.isUnlocked ? (
-            <button
-              type="button"
-              disabled
-              className="w-full py-2.5 bg-green-950 border border-green-600 text-green-300 text-[8px] font-bold rounded cursor-default flex items-center justify-center shadow"
-            >
-              UNLOCKED
-            </button>
+            <div className="flex-1 py-2.5 bg-green-950 border border-green-600 text-green-300 text-[8px] font-bold rounded cursor-default flex items-center justify-center shadow">
+              ✓ UNLOCKED
+            </div>
           ) : (
             <button
               type="button"
               onClick={handlePurchase}
               disabled={!canAfford}
-              className={`w-full py-2.5 px-4 text-[9px] font-bold rounded transition-all flex items-center justify-center gap-2 cursor-pointer active:translate-y-0.5 ${
+              className={`flex-1 py-2.5 px-4 text-[9px] font-bold rounded transition-all flex items-center justify-center gap-2 cursor-pointer active:translate-y-0.5 ${
                 canAfford
                   ? "bg-amber-600 hover:bg-amber-500 text-neutral-950 shadow-[0_2px_0_0_#78350f]"
                   : "bg-neutral-800 text-neutral-500 border border-neutral-700 cursor-not-allowed opacity-80"
@@ -173,6 +191,17 @@ export default function StoreDialog({
               <span>BUY FOR {item.price.toLocaleString()} PTS</span>
             </button>
           )}
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
+            className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 hover:text-white text-[8px] font-bold rounded cursor-pointer transition-colors shadow whitespace-nowrap"
+          >
+            BACK TO MAP
+          </button>
         </div>
       </div>
     </div>

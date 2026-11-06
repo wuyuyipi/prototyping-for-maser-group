@@ -21,8 +21,14 @@ export default function AvatarSelectModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-xl bg-neutral-900 border-2 border-yellow-500 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-xl bg-neutral-900 border-2 border-yellow-500 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4 cursor-default"
+      >
         {/* Header */}
         <div className="flex justify-between items-center border-b border-neutral-800 pb-2.5">
           <div>

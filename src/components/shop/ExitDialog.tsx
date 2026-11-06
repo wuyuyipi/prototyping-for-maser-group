@@ -18,8 +18,14 @@ export default function ExitDialog({
   onClose,
 }: ExitDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none">
-      <div className="relative w-full max-w-md bg-neutral-900 border-2 border-emerald-500 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4 text-center">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xs select-none cursor-pointer"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-md bg-neutral-900 border-2 border-emerald-500 rounded-lg p-5 shadow-2xl font-pixel text-neutral-100 flex flex-col gap-4 text-center cursor-default"
+      >
         <div>
           <h3 className="text-xs font-bold text-emerald-300 tracking-wider mb-1">
             EXIT TO LIVING ROOM

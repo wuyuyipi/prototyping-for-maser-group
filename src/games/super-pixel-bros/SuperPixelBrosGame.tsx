@@ -207,7 +207,7 @@ export default function SuperPixelBrosGame({
       if (["ArrowUp", "KeyW", "Space"].includes(e.code)) {
         e.preventDefault();
         if (!gameStateRef.current.keys.jump && gameStateRef.current.player.grounded) {
-          gameStateRef.current.player.vy = -6.2;
+          gameStateRef.current.player.vy = -7.0;
           gameStateRef.current.player.grounded = false;
           playSound("jump");
         }
@@ -267,8 +267,8 @@ export default function SuperPixelBrosGame({
       const { player, keys, enemies, blocks, flagpoleX } = state;
 
       const groundSpeed = 1.24;
-      // Controlled air speed prevents overshooting forward when jumping while moving
-      const currentSpeed = player.grounded ? groundSpeed : groundSpeed * 0.82;
+      // Controlled air speed (0.85) ensures a high jump doesn't launch too far forward
+      const currentSpeed = player.grounded ? groundSpeed : 0.85;
 
       if (player.alive && !won && !gameOver) {
         if (keys.left) {
@@ -290,11 +290,11 @@ export default function SuperPixelBrosGame({
           }
         }
 
-        // Crisp, controlled jump arc (shorter hang time prevents jumping too far forward)
+        // High vertical jump with crisp, controlled descent
         if (player.vy < 0) {
-          player.vy += keys.jump ? 0.48 : 0.85;
+          player.vy += keys.jump ? 0.43 : 0.80;
         } else {
-          player.vy += 0.64;
+          player.vy += 0.58;
         }
         if (player.vy > 7.5) player.vy = 7.5;
 

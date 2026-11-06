@@ -207,7 +207,7 @@ export default function SuperPixelBrosGame({
       if (["ArrowUp", "KeyW", "Space"].includes(e.code)) {
         e.preventDefault();
         if (!gameStateRef.current.keys.jump && gameStateRef.current.player.grounded) {
-          gameStateRef.current.player.vy = -7.8;
+          gameStateRef.current.player.vy = -7.2;
           gameStateRef.current.player.grounded = false;
           playSound("jump");
         }
@@ -277,15 +277,21 @@ export default function SuperPixelBrosGame({
           player.facingRight = true;
           player.animFrame += 0.28;
         } else {
-          player.vx *= 0.65;
-          if (Math.abs(player.vx) < 0.1) player.vx = 0;
+          // Sharp ground braking (stops slide after landing)
+          if (player.grounded) {
+            player.vx *= 0.2;
+            if (Math.abs(player.vx) < 0.2) player.vx = 0;
+          } else {
+            player.vx *= 0.75;
+            if (Math.abs(player.vx) < 0.1) player.vx = 0;
+          }
         }
 
-        // Snappy, authentic platformer gravity (variable jump cut-off & crisp fall)
+        // Heavy, tight platformer gravity (no floatiness)
         if (player.vy < 0) {
-          player.vy += keys.jump ? 0.44 : 0.76;
+          player.vy += keys.jump ? 0.52 : 0.95;
         } else {
-          player.vy += 0.56;
+          player.vy += 0.72;
         }
         if (player.vy > 8.5) player.vy = 8.5;
 
@@ -301,6 +307,9 @@ export default function SuperPixelBrosGame({
           player.y = groundY;
           player.vy = 0;
           player.grounded = true;
+          if (!keys.left && !keys.right) {
+            player.vx = 0;
+          }
         }
 
         // Solid structures collision (Pipes, Stone Steps, Floating Platforms)
@@ -316,6 +325,9 @@ export default function SuperPixelBrosGame({
               player.y = st.y - player.height;
               player.vy = 0;
               player.grounded = true;
+              if (!keys.left && !keys.right) {
+                player.vx = 0;
+              }
             } else if (st.kind !== "platform") {
               // Side collision for solid pipes and stone steps
               if (player.vx > 0 && player.x + player.width - player.vx <= st.x + 4) {
@@ -391,6 +403,9 @@ export default function SuperPixelBrosGame({
               player.y = block.y - player.height;
               player.vy = 0;
               player.grounded = true;
+              if (!keys.left && !keys.right) {
+                player.vx = 0;
+              }
             }
           }
 
